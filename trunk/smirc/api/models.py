@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 class Room(models.Model):
 	name = models.CharField(max_length=16)
-	creator = models.ForeignKey(User)
+	owner = models.ForeignKey(User)
 	users = models.ManyToManyField(User, related_name="rooms", through="Membership")
 
 	def __unicode__(self):
