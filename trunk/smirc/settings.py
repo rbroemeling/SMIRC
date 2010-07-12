@@ -58,6 +58,11 @@ MEDIA_URL = ''
 # Examples: "http://foo.com/media/", "/media/".
 ADMIN_MEDIA_PREFIX = '/media/'
 
+# Tie our custom user profile class to the User.get_profile() method.
+# Technique taken from:
+#	http://www.b-list.org/weblog/2006/jun/06/django-tips-extending-user-model/
+AUTH_PROFILE_MODULE = 'api.UserProfile'
+
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = '_b!mf0hketu4xt(l-j+ilw75*bh&xqt#25!v1(8rmv@l3q81wo'
 
