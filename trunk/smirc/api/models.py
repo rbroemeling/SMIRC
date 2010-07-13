@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 class Room(models.Model):
 	name = models.CharField(max_length=16)
 	owner = models.ForeignKey(User)
-	users = models.ManyToManyField(User, related_name="rooms", through="Membership")
+	users = models.ManyToManyField(User, related_name='rooms', through='Membership')
 
 	def __unicode__(self):
 		return self.name
@@ -15,7 +15,7 @@ class Membership(models.Model):
 	voice = models.BooleanField()
 
 	def __unicode__(self):
-		return "%s:%s" % (room.name, user.name)
+		return '%s:%s' % (room.name, user.name)
 
 class Message(models.Model):
 	user = models.ForeignKey(User)
