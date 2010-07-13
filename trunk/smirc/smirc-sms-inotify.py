@@ -2,19 +2,17 @@
 #
 # Monitor a directory for incoming SMS messages and deal with them as they arrive.
 #
-import optparse
 import logging
+import optparse
+import os
 import pyinotify
 import re
 
 __version__ = "$Rev$"
 
 class SMSFileHandler(pyinotify.ProcessEvent):
-	def process_IN_CREATE(self, event):
-		print "IN_CREATE:", event.pathname
-
 	def process_IN_CLOSE_WRITE(self, event):
-		print "IN_CLOSE_WRITE:", event.pathname
+		logging.debug("event IN_CLOSE_WRITE occurred for %s" % event.pathname)
 
 def parse_arguments():
 	"""
@@ -31,13 +29,28 @@ def parse_arguments():
 		default=False,
 		help="enable display of verbose debugging information"
 	)
+	parser.add_option(
+		"--path",
+		action="append",
+		help="path to watch for new files in"
+	)
 	
 	(options, args) = parser.parse_args()
+	if not options.path:
+		parser.error("option --path: at least one path to watch is required")
+	else:
+		for path in options.path:
+			if not os.path.exists(path):
+				parser.error("option --path: %s does not exist" % path)
+			if not os.path.isdir(path):
+				parser.error("option --path: %s is not a directory" % path)
+			if not os.access(path, os.R_OK):
+				parser.error("option --path: %s is not accessible" % path)
 	return options
 
 if __name__ == "__main__":
 	options = parse_arguments()
-	
+
 	# Initialize our logging layer.
 	loglevel = logging.INFO
 	if options.debug:
@@ -50,6 +63,6 @@ if __name__ == "__main__":
 	watch_manager = pyinotify.WatchManager()
 	sms_file_handler = SMSFileHandler()
 	notifier = pyinotify.Notifier(watch_manager, sms_file_handler)
-	watch_manager.add_watch('/tmp', pyinotify.IN_CLOSE_WRITE, rec=True)
+	watch_manager.add_watch(options.path, pyinotify.IN_CLOSE_WRITE)
 	
 	notifier.loop()
