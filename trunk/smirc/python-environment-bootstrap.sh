@@ -133,6 +133,9 @@ sudo -u pythonbin rm -r "MySQL-python-1.2.3" "MySQL-python-1.2.3.tar.gz"
 # Install Django.
 sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" django
 
+# Install Pyinotify.
+sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" pyinotify
+
 # Install Celery
 #sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" celery
 #sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" django-celery
