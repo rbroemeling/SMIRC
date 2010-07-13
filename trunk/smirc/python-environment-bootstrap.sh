@@ -134,8 +134,8 @@ sudo -u pythonbin rm -r "MySQL-python-1.2.3" "MySQL-python-1.2.3.tar.gz"
 sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" django
 
 # Install Celery
-sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" celery
-sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" django-celery
+#sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" celery
+#sudo -u pythonbin /usr/local/bin/easy_install --prefix="${PYTHON_ENVIRONMENT_PATH}" django-celery
 
 # Ensure that our stow links are up-to-date.
 cd /usr/local/stow
