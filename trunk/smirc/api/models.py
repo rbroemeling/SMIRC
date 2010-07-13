@@ -44,6 +44,7 @@ class Message(models.Model):
 			room_match = re.match('\s*@(\S+)\s*', self.body)
 			if room_match:
 				self.room = Room.objects.get(name=room_match.group(1))
+				self.user.get_profile().room = self.room
 				self.body = self.body[room_match.end()+1:]
 			else:
 				self.room = self.user.get_profile().room
