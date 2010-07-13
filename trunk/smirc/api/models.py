@@ -1,3 +1,4 @@
+import re
 from django.db import models
 from django.contrib.auth.models import User
 
@@ -38,7 +39,14 @@ class Message(models.Model):
 				else:
 					self.body = ''
 		if self.headers['from']:
-			# self.user = FIND THIS USER IN DJANGO
+			self.user = UserProfile.objects.get(phone_number=self.headers['from']).user
+		if self.body:
+			room_match = re.match('\s*@(\S+)\s*', self.body)
+			if room_match:
+				self.room = Room.objects.get(name=room_match.group(1))
+				self.body = self.body[room_match.end()+1:]
+			else:
+				self.room = self.user.get_profile().room
 
 	def render():
 		data = ''
@@ -54,6 +62,7 @@ class Message(models.Model):
 #    http://www.b-list.org/weblog/2006/jun/06/django-tips-extending-user-model/
 class UserProfile(models.Model):
 	phone_number = models.BigIntegerField(unique=True)
+	room = models.ForeignKey(Room)
 	user = models.ForeignKey(User, unique=True)
 
 	def __unicode__(self):
