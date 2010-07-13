@@ -2,11 +2,19 @@
 #
 # Monitor a directory for incoming SMS messages and deal with them as they arrive.
 #
+# Note that because this daemon includes django models and thus has a dependency
+# on the django framework, it requires the DJANGO_SETTINGS_MODULE environment
+# variable to be set.
+#   See http://docs.djangoproject.com/en/dev/topics/settings/ for more information.
+#
 import logging
 import optparse
 import os
 import pyinotify
 import re
+from api.models import Message
+from api.models import UserProfile
+from api.models import Room
 
 __version__ = "$Rev$"
 

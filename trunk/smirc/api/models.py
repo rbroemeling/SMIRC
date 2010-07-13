@@ -17,6 +17,37 @@ class Membership(models.Model):
 	def __unicode__(self):
 		return "%s:%s" % (room.name, user.name)
 
+class Message(models.Model):
+	user = models.ForeignKey(User)
+	room = models.ForeignKey(Room)
+	body = None	
+	headers = {}
+
+	def parse(data):
+		self.body = None
+		self.headers = {}
+		for line in data.splitlines():
+			if not self.body is None:
+				self.body += line
+			else:
+				if line:
+					(key, value) = line.split(':', 1)
+					key = key.strip().lower()
+					value = value.strip()
+					self.headers[key] = value
+				else:
+					self.body = ''
+		if self.headers['from']:
+			# self.user = FIND THIS USER IN DJANGO
+
+	def render():
+		data = ''
+		for key, value in self.headers:
+			data += '%s: %s\n' % (key, value)
+		data += '\n'
+		data += ('%s@%s: %s' % (self.user.name, self.room.name, self.body))[:140]
+		return data
+
 # Add a user profile to the Django User model so that we can
 # add on our own fields/user data as necessary.
 # Technique taken from:
