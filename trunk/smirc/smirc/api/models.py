@@ -70,7 +70,7 @@ class Message(models.Model):
 				if profile.room:
 					self.room = profile.room
 				else:
-					raise FieldError('no default room found')
+					raise FieldError('no target room defined and no default room found')
 		else:
 			raise FieldError('null message body')
 		self.save()
