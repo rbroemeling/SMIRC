@@ -5,8 +5,9 @@ from django.conf.urls.defaults import *
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-	# Example:
-	# (r'^smirc/', include('smirc.foo.urls')),
+	# Pass entire api/ subtree to smirc.api.urls
+	(r'^api/', include('smirc.api.urls')),
+	# Route everything else to smirc.www.urls
 	(r'', include('smirc.www.urls'))
 
 	# Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
