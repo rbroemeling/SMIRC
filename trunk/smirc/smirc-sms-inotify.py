@@ -12,15 +12,22 @@ import optparse
 import os
 import pyinotify
 import re
-from api.models import Message
-from api.models import UserProfile
-from api.models import Room
+from smirc.api.models import Message
+from smirc.api.models import UserProfile
+from smirc.api.models import Room
 
 __version__ = '$Rev$'
 
 class SMSFileHandler(pyinotify.ProcessEvent):
 	def process_IN_CLOSE_WRITE(self, event):
 		logging.debug('event IN_CLOSE_WRITE occurred for %s' % event.pathname)
+		try:
+			with open(event.pathname, 'r') as f:
+				data = f.read()
+			message = Message()
+			message.parse(data)
+		except IOError, e:
+			logging.error('error reading file: %s', str(e))
 
 def parse_arguments():
 	'''

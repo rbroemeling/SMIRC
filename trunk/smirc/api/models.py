@@ -1,3 +1,4 @@
+import logging
 import re
 from django.db import models
 from django.contrib.auth.models import User
@@ -24,7 +25,7 @@ class Message(models.Model):
 	body = None	
 	headers = {}
 
-	def parse(data):
+	def parse(self, data):
 		self.body = None
 		self.headers = {}
 		for line in data.splitlines():
@@ -32,13 +33,16 @@ class Message(models.Model):
 				self.body += line
 			else:
 				if line:
-					(key, value) = line.split(':', 1)
-					key = key.strip().lower()
-					value = value.strip()
-					self.headers[key] = value
+					try:
+						(key, value) = line.split(':', 1)		
+						key = key.strip().lower()
+						value = value.strip()
+						self.headers[key] = value
+					except ValueError, e:
+						logging.warn('skipping invalid header: "%s"' % (line))
 				else:
 					self.body = ''
-		if self.headers['from']:
+		if self.headers.has_key('from'):
 			self.user = UserProfile.objects.get(phone_number=self.headers['from']).user
 		if self.body:
 			room_match = re.match('\s*@(\S+)\s*', self.body)
@@ -49,7 +53,7 @@ class Message(models.Model):
 			else:
 				self.room = self.user.get_profile().room
 
-	def render():
+	def render(self):
 		data = ''
 		for key, value in self.headers:
 			data += '%s: %s\n' % (key, value)
