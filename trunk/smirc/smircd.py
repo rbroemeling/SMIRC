@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 #
 # Monitor a directory for incoming SMS messages and deal with them as they arrive.
 #
