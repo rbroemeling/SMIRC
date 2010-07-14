@@ -41,6 +41,14 @@ INSTALLED_APPS = (
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
+# Configure Python's logging module for use throughout smirc.
+import logging
+loglevel = logging.INFO
+if DEBUG:
+	loglevel = logging.DEBUG
+logging.basicConfig(datefmt = '%d %b %Y %H:%M:%S', format = '%(asctime)s %(levelname)-8s %(message)s', level = loglevel)
+del loglevel
+
 MANAGERS = ADMINS
 
 # Absolute path to the directory that holds media.
@@ -66,6 +74,12 @@ ROOT_URLCONF = 'smirc.urls'
 SECRET_KEY = '_b!mf0hketu4xt(l-j+ilw75*bh&xqt#25!v1(8rmv@l3q81wo'
 
 SITE_ID = 1
+
+# Configuration for smstools sms inbound/outbound directories.
+SMSTOOLS = {
+	'inbound_dir': '/tmp/inbound',
+	'outbound_dir': '/tmp/outbound'
+}
 
 TEMPLATE_DEBUG = DEBUG
 
