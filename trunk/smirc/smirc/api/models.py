@@ -13,6 +13,9 @@ class Room(models.Model):
 		return self.name
 
 class Membership(models.Model):
+	class Meta:
+		unique_together = (('user','room'))
+
 	user = models.ForeignKey(User)
 	room = models.ForeignKey(Room)
 	voice = models.BooleanField()
