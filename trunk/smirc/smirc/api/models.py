@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
 
 class Room(models.Model):
-	name = models.CharField(max_length=16)
+	name = models.CharField(max_length=16, db_index=True)
 	owner = models.ForeignKey(User)
 	users = models.ManyToManyField(User, related_name='rooms', through='Membership')
 
@@ -23,7 +23,7 @@ class Membership(models.Model):
 class Message(models.Model):
 	user = models.ForeignKey(User)
 	room = models.ForeignKey(Room)
-	body = None	
+	body = None
 	headers = {}
 
 	def parse(self, data):
@@ -88,8 +88,8 @@ class Message(models.Model):
 # Technique taken from:
 #    http://www.b-list.org/weblog/2006/jun/06/django-tips-extending-user-model/
 class UserProfile(models.Model):
-	phone_number = models.BigIntegerField(unique=True)
-	room = models.ForeignKey(Room)
+	last_active_room = models.ForeignKey(Room)
+	phone_number = models.BigIntegerField(primary_key=True)
 	user = models.ForeignKey(User, unique=True)
 
 	def __unicode__(self):
