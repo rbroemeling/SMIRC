@@ -1,5 +1,48 @@
 {% extends "page_skeleton.html" %}
 
+{% block header %}
+<style type="text/css">
+div#create_account
+{
+	width: 11.0em;
+}
+</style>
+{% endblock %}
+
 {% block content %}
-What is SMIRC?
+<!-- IF user is not logged in... -->
+<form>
+	<div class="form_container" id="create_account">
+		<div class="form_element">
+			<div class="form_label"><label for="phone_number">Phone Number</label></div>
+			<div class="form_input"><input name="phone_number" type="text" size="24" /></div>
+		</div>
+		<div class="form_element">
+			<div class="form_label"><label for="username">Username</label></div>
+			<div class="form_input"><input name="username" type="text" size="24" /></div>
+		</div>
+		<div class="form_element">
+			<div class="form_label"><label for="password">Password</label></div>
+			<div class="form_input"><input name="password" type="password" size="24" /></div>
+		</div>
+		<div class="form_element">
+			<div class="form_label"><label for="password_repeated">Password (Repeated)</label></div>
+			<div class="form_input"><input name="password_repeated" type="password" size="24" /></div>
+		</div>
+		<div class="form_element">
+			<div class="form_input submit"><input type="submit" value="Create Account" /></div>
+		</div>
+	</div>
+</form>
+
+<h1>What is SMIRC?</h1>
+<p>
+	SMIRC (Short Message Internet Relay Chat) is a fusion of <a href="http://en.wikipedia.org/wiki/Short_Message_Service">Short Message Service</a>
+	(also known as "SMS" or "texting" to most any user of a cellphone) and <a href="http://en.wikipedia.org/wiki/Internet_Relay_Chat">Internet Relay Chat</a>.
+	SMIRC's goal is to ease the use of texting between groups of people: instead of sending a text to <i>a person</i>, on SMIRC a text is sent to <i>a room of people</i>.
+</p>
+
+<!-- END IF -->
+		
+
 {% endblock %}

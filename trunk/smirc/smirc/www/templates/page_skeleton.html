@@ -1,7 +1,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 	<head>
-		<title>SMIRC{% block title %}{% endblock subtitle %}</title>
+		<title>SMIRC{% block title %}{% endblock title %}</title>
 
 		<style type="text/css">
 			body
@@ -9,10 +9,52 @@
 				background: #ffffff;
 				color: #444444;
 			}
+			
+			div.form_container
+			{
+				border: 1px solid;
+				padding-left: 10px;
+				padding-right: 10px;
+				padding-top: 10px;
+			}
+			
+			div.form_container div.form_element
+			{
+				margin-bottom: 10px;
+			}
+			
+			div.form_container div.submit
+			{
+				text-align: right;
+			}
+			
+			div#login
+			{
+				float: right;
+				width: 11.0em;
+			}
 		</style>
+		{% block header %}{% endblock header %}
 	</head>
 	<body>
 		<div id="content">
+			<!-- IF user is not logged in... -->
+			<form>
+				<div class="form_container" id="login">
+					<div class="form_element">
+						<div class="form_label"><label for="login">Username or Phone Number</label></div>
+						<div class="form_input"><input name="login" type="text" size="24" /></div>
+					</div>
+					<div class="form_element">
+						<div class="form_label"><label for="password">Password</label></div>
+						<div class="form_input"><input name="password" type="password" size="24" /></div>
+					</div>
+					<div class="form_element">
+						<div class="form_input submit"><input type="submit" value="Login" /></div>
+					</div>
+				</div>
+			</form>
+			<!-- END IF -->
 			{% block content %}{% endblock content %}
 		</div>
 	</body>
