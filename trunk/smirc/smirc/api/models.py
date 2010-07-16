@@ -5,6 +5,9 @@ from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
 
 class Room(models.Model):
+	class Meta:
+		unique_together = (('owner','name'))
+
 	name = models.CharField(max_length=16, db_index=True)
 	owner = models.ForeignKey(User)
 	users = models.ManyToManyField(User, related_name='rooms', through='Membership')
