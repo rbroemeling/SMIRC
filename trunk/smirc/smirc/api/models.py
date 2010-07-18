@@ -1,8 +1,5 @@
-import logging
-import re
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.exceptions import FieldError
 
 class Room(models.Model):
 	class Meta:

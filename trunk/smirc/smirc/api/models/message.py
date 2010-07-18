@@ -5,8 +5,6 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
 
-tempfile.tempdir = settings.SMSTOOLS['outbound_dir']
-
 class MessageSkeleton(models.Model):
 	user = models.ForeignKey(User)
 	room = models.ForeignKey(Room)
@@ -25,34 +23,38 @@ class MessageSkeleton(models.Model):
 		self.user = profile.user
 
 		if body:
+			command_match = re.match('\s*/(\S+)\s*', body)
+			if command_match:
+				command = command_match.group(1)
+				command_body = body[command_match.end()+1:]
+				return
+
 			room_match = re.match('\s*@(\S+)\s*', body)
-			# TODO: the roommatching code below IS NOT RIGHT.  Figure it out.
 			if room_match:
-				room_name = room_match.group(1)
-				self.body = body[room_match.end()+1:]
+				room = room_match.group(1)
+				body = body[room_match.end()+1:]
 				try:
-					membership = Membership.objects.get(user=self.user, room.name=room_name)
-					self.room = membership.room
-				except Membership.DoesNotExist:
-					raise FieldError('unknown message room: %s' % (room_name))
+					self.room = Room.objects.get(name__iexact=room, users__user__id__exact=self.user.id)
+				except Room.DoesNotExist:
+					raise FieldError('unknown message room: %s' % (room))
 				if profile.room != self.room:
 					profile.room = self.room
 					profile.save()
 			else:
-				self.body = body
 				if profile.room:
 					self.room = profile.room
-				else:
-					raise FieldError('no target room defined and no default room found')
-		else:
+			self.body = body
+
+		if self.body is None:
 			raise FieldError('null message body')
+		if self.room is None:
+			raise FieldError('no target room defined and no default room found')
 		self.save()
 
 	def send(self, phone_number, message):
 		message = '%s@%s: %s' % (self.user.name, self.room.name, message)
 		message = message[:140]
 		self.raw_send(phone_number, message)
-
 
 class SMSTools(MessageSkeleton):
 	def raw_receive(self, location):
@@ -79,6 +81,7 @@ class SMSTools(MessageSkeleton):
 			return (None, body)
 
 	def raw_send(self, phone_number, message):
+		tempfile.tempdir = settings.SMSTOOLS['outbound_dir']
 		(f, path) = tempfile.mkstemp('suffix', 'prefix', None, True)
 		f.write('To: %s\n' % (phone_number))
 		f.write('\n')
