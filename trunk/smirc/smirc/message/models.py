@@ -4,13 +4,10 @@ import tempfile
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
-from smirc.api.models.room import Room
-from smirc.api.models.userprofile import UserProfile
+from smirc.chat.models import Room
+from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
-	class Meta:
-		app_label = 'api'
-
 	user = models.ForeignKey(User)
 	room = models.ForeignKey(Room)
 	body = None
@@ -62,9 +59,6 @@ class MessageSkeleton(models.Model):
 		self.raw_send(phone_number, message)
 
 class SMSToolsMessage(MessageSkeleton):
-	class Meta:
-		app_label = 'api'
-
 	def raw_receive(self, location):
 		body = None
 		headers = {}
