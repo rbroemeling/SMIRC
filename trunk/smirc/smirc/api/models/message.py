@@ -6,6 +6,9 @@ from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
 
 class MessageSkeleton(models.Model):
+	class Meta:
+		app_label = 'api'
+
 	user = models.ForeignKey(User)
 	room = models.ForeignKey(Room)
 	body = None
@@ -57,6 +60,9 @@ class MessageSkeleton(models.Model):
 		self.raw_send(phone_number, message)
 
 class SMSTools(MessageSkeleton):
+	class Meta:
+		app_label = 'api'
+
 	def raw_receive(self, location):
 		body = None
 		headers = {}

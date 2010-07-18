@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 
 class Room(models.Model):
 	class Meta:
+		app_label = 'api'
 		unique_together = (('owner','name'))
 
 	name = models.CharField(max_length=16, db_index=True)
@@ -14,6 +15,7 @@ class Room(models.Model):
 
 class Membership(models.Model):
 	class Meta:
+		app_label = 'api'
 		unique_together = (('user','room'))
 
 	user = models.ForeignKey(User)
@@ -28,6 +30,9 @@ class Membership(models.Model):
 # Technique taken from:
 #    http://www.b-list.org/weblog/2006/jun/06/django-tips-extending-user-model/
 class UserProfile(models.Model):
+	class Meta:
+		app_label = 'api'
+	
 	last_active_room = models.ForeignKey(Room)
 	phone_number = models.BigIntegerField(primary_key=True)
 	user = models.ForeignKey(User, unique=True)
