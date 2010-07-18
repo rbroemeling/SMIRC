@@ -1,17 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-class Membership(models.Model):
-	class Meta:
-		unique_together = (('user','room'))
-
-	user = models.ForeignKey(User)
-	room = models.ForeignKey(Room)
-	voice = models.BooleanField()
-
-	def __unicode__(self):
-		return '%s:%s' % (room.name, user.name)
-
 class Room(models.Model):
 	class Meta:
 		unique_together = (('owner','name'))
@@ -22,6 +11,17 @@ class Room(models.Model):
 
 	def __unicode__(self):
 		return self.name
+
+class Membership(models.Model):
+	class Meta:
+		unique_together = (('user','room'))
+
+	user = models.ForeignKey(User)
+	room = models.ForeignKey(Room)
+	voice = models.BooleanField()
+
+	def __unicode__(self):
+		return '%s:%s' % (room.name, user.name)
 
 # Add a user profile to the Django User model so that we can
 # add on our own fields/user data as necessary.
