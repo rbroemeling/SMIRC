@@ -61,7 +61,7 @@ class MessageSkeleton(models.Model):
 		message = message[:140]
 		self.raw_send(phone_number, message)
 
-class SMSTools(MessageSkeleton):
+class SMSToolsMessage(MessageSkeleton):
 	class Meta:
 		app_label = 'api'
 
