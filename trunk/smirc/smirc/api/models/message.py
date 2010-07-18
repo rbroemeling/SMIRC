@@ -4,6 +4,8 @@ import tempfile
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
+from smirc.api.models import Room
+from smirc.api.models import UserProfile
 
 class MessageSkeleton(models.Model):
 	class Meta:
