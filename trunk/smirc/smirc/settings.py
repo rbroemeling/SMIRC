@@ -11,7 +11,7 @@ ADMINS = (
 # Tie our custom user profile class to the User.get_profile() method.
 # Technique taken from:
 #	http://www.b-list.org/weblog/2006/jun/06/django-tips-extending-user-model/
-AUTH_PROFILE_MODULE = 'api.UserProfile'
+AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
 DEBUG = True
 
@@ -37,7 +37,9 @@ INSTALLED_APPS = (
 	'django.contrib.messages',
 	# Uncomment the next line to enable the admin:
 	# 'django.contrib.admin',
-	'smirc.api',
+	'smirc.chat',
+	'smirc.command',
+	'smirc.message',
 	'smirc.www'
 )
 

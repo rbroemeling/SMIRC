@@ -5,8 +5,6 @@ from django.conf.urls.defaults import *
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-	# Pass entire api/ subtree to smirc.api.urls
-	(r'^api/', include('smirc.api.urls')),
 	# Route everything else to smirc.www.urls
 	(r'', include('smirc.www.urls'))
 
