@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from smirc.api.models import Room
+from smirc.api.models.room import Room
 
 # Add a user profile to the Django User model so that we can
 # add on our own fields/user data as necessary.

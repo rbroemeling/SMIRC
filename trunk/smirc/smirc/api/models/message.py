@@ -4,8 +4,8 @@ import tempfile
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
-from smirc.api.models import Room
-from smirc.api.models import UserProfile
+from smirc.api.models.room import Room
+from smirc.api.models.userprofile import UserProfile
 
 class MessageSkeleton(models.Model):
 	class Meta:
@@ -68,7 +68,7 @@ class SMSToolsMessage(MessageSkeleton):
 	def raw_receive(self, location):
 		body = None
 		headers = {}
-		while open(location, 'r') as f:
+		with open(location, 'r') as f:
 			for line in f:
 				if not body is None:
 					body += line

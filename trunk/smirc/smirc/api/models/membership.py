@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
-from smirc.api.models import Room
+from django.db import models
+from smirc.api.models.room import Room
 
 class Membership(models.Model):
 	class Meta:
