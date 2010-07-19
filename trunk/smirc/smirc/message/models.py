@@ -11,7 +11,6 @@ class MessageSkeleton(models.Model):
 	user = models.ForeignKey(User)
 	room = models.ForeignKey(Room)
 	body = None
-	headers = {}
 
 	def receive(self, data):
 		(phone_number, body) = self.raw_receive(data)
@@ -62,21 +61,25 @@ class SMSToolsMessage(MessageSkeleton):
 	def raw_receive(self, location):
 		body = None
 		headers = {}
-		with open(location, 'r') as f:
-			for line in f:
-				if not body is None:
-					body += line
-				else:
-					if line:
-						try:
-							(key, value) = line.split(':', 1)		
-							key = key.strip().lower()
-							value = value.strip()
-							headers[key] = value
-						except ValueError, e:
-							logging.warn('skipping invalid header: "%s"' % (line))
+		try:
+			with open(location, 'r') as f:
+				for line in f:
+					if not body is None:
+						body += line
 					else:
-						body = ''
+						if line != '\n':
+							try:
+								(key, value) = line.split(':', 1)		
+								key = key.strip().lower()
+								value = value.strip()
+								headers[key] = value
+							except ValueError, e:
+								logging.warn('skipping invalid header: "%s"' % (line))
+						else:
+							body = ''
+		except IOError, e:
+			logging.warning('I/O error encountered attempting to read file: %s' % (str(e)))
+			pass
 		if headers.has_key('from'):
 			return (headers['from'], body)
 		else:
@@ -89,3 +92,57 @@ class SMSToolsMessage(MessageSkeleton):
 		f.write('\n')
 		f.write('%s\n' % (message))
 		f.close()
+		return path
+
+import os
+import unittest
+
+class SMSToolsMessageTestCase(unittest.TestCase):
+	def setUp(self):
+		open('/tmp/permissionerror.message', 'w').close()
+		os.chmod('/tmp/permissionerror.message', 0)
+		open('/tmp/empty.message', 'w').close()
+		with open('/tmp/unknownuser.message', 'w') as f:
+			f.write("""From: 491721234567
+From_SMSC: 491722270333
+Sent: 00-02-21 22:26:23
+Received: 00-02-21 22:26:29
+Subject: modem1
+Alphabet: ISO
+UDH: false
+
+This is the Text that I have sent with my mobile phone to the computer.""")
+		self.msg = SMSToolsMessage()
+
+	def tearDown(self):
+		os.remove('/tmp/permissionerror.message')
+		os.remove('/tmp/empty.message')
+		os.remove('/tmp/unknownuser.message')
+
+	def test_receive_empty(self):
+		self.assertEqual(self.msg.raw_receive('/tmp/empty.message'), (None, None))
+		try:
+			self.assertRaises(FieldError, self.msg.receive('/tmp/empty.message'))
+		except FieldError:
+			pass
+
+	def test_receive_nonexistent(self):
+		self.assertEqual(self.msg.raw_receive('/tmp/nonexistent.message'), (None, None))
+		try:
+			self.assertRaises(FieldError, self.msg.receive('/tmp/nonexistent.message'))
+		except FieldError:
+			pass
+
+	def test_receive_permissionerror(self):
+		self.assertEqual(self.msg.raw_receive('/tmp/permissionerror.message'), (None, None))
+		try:
+			self.assertRaises(FieldError, self.msg.receive('/tmp/permissionerror.message'))
+		except FieldError:
+			pass
+
+	def test_receive_unknownuser(self):
+		self.assertEqual(self.msg.raw_receive('/tmp/unknownuser.message'), ('491721234567', 'This is the Text that I have sent with my mobile phone to the computer.'))
+		try:
+			self.assertRaises(FieldError, self.msg.receive('/tmp/unknownuser.message'))
+		except FieldError:
+			pass
