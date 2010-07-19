@@ -54,7 +54,6 @@ class MessageSkeleton(models.Model):
 				raise FieldError('no target room defined and no default room found')
 
 		self.body = body
-		self.save()
 
 	def send(self, phone_number, message):
 		if self.body is None:
