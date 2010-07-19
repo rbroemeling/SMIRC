@@ -55,7 +55,10 @@ class MessageSkeleton(models.Model):
 	def send(self, phone_number, message):
 		message = '%s@%s: %s' % (self.user.name, self.room.name, message)
 		message = message[:140]
-		self.raw_send(phone_number, message)
+		return self.raw_send(phone_number, message)
+
+	def system_send(self, phone_number, message):
+		return self.send(phone_number, "SMIRC %s" % (message))
 
 class SMSToolsMessage(MessageSkeleton):
 	def raw_receive(self, location):
