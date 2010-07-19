@@ -5,16 +5,22 @@
 # Note that because this daemon includes django models and thus has a dependency
 # on the django framework, it requires the DJANGO_SETTINGS_MODULE environment
 # variable to be set.
-#   See http://docs.djangoproject.com/en/dev/topics/settings/ for more information.
+#
+# In general, an example DJANGO_SETTINGS_MODULE environment variable setting will look
+# like this:
+#
+#	export DJANGO_SETTINGS_MODULE="smirc.settings"
+#
+# See http://docs.djangoproject.com/en/dev/topics/settings/ for more information.
 #
 import logging
 import os
 import pyinotify
 import sys
 from django.conf import settings
-from smirc.api.models import Message
-from smirc.api.models import UserProfile
-from smirc.api.models import Room
+from smirc.chat.models import Room
+from smirc.chat.models import UserProfile
+from smirc.message.models import SMSToolsMessage
 
 __version__ = '$Rev$'
 
