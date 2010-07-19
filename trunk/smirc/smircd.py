@@ -26,12 +26,13 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 	def process_IN_CLOSE_WRITE(self, event):
 		logging.debug('event IN_CLOSE_WRITE occurred for %s' % event.pathname)
 		message = SMSToolsMessage()
+		receive_exception = None
 		try:
 			message.receive(event.pathname)
 			if (message.command):
 				# TODO: deal with the command message.command (arguments are in message.body)
 			else:
-				# TODO: deal with the message in message.body, send by message.user to message.room
+				# TODO: deal with the message in message.body, sent by message.user to message.room
 		except FieldError, e:
 			if message.user:
 				response = SMSToolsMessage()
@@ -39,9 +40,11 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 				response.system = True
 				response.send(message.user.profile.phone_number)
 			else:
-				logging.warning('fielderror exception occurred while receiving message %s: %s' % (event.pathname, str(e)))
+				receive_exception = e
 		except Exception, e:
-			logging.error('unknown exception occurred while receiving message %s: %s' % (event.pathname, str(e))
+			receive_exception = e
+		if receive_exception:
+			logging.warning('unhandled exception occurred while receiving message %s: %s' % (event.pathname, str(receive_exception))
 
 def smircd_sanity_check():
 	errors = 0
