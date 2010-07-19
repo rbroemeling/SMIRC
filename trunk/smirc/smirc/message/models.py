@@ -8,9 +8,10 @@ from smirc.chat.models import Room
 from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
-	user = models.ForeignKey(User)
-	room = models.ForeignKey(Room)
 	body = None
+	room = models.ForeignKey(Room)
+	system = False	
+	user = models.ForeignKey(User)
 
 	def receive(self, data):
 		(phone_number, body) = self.raw_receive(data)
@@ -53,12 +54,18 @@ class MessageSkeleton(models.Model):
 		self.save()
 
 	def send(self, phone_number, message):
-		message = '%s@%s: %s' % (self.user.name, self.room.name, message)
+		if self.body is None:
+			raise FieldError('null message body')
+		if self.system:
+			message = 'SMIRC: %s' % (message)		
+		else:
+			if self.room is None:
+				raise FieldError('null message room')
+			if self.user is None:
+				raise FieldError('null message sender')
+			message = '%s@%s: %s' % (self.user.name, self.room.name, message)
 		message = message[:140]
 		return self.raw_send(phone_number, message)
-
-	def system_send(self, phone_number, message):
-		return self.send(phone_number, "SMIRC %s" % (message))
 
 class SMSToolsMessage(MessageSkeleton):
 	def raw_receive(self, location):
