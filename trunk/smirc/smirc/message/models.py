@@ -55,17 +55,17 @@ class MessageSkeleton(models.Model):
 
 		self.body = body
 
-	def send(self, phone_number, message):
+	def send(self, phone_number):
 		if self.body is None:
 			raise FieldError('null message body')
 		if self.system:
-			message = 'SMIRC: %s' % (message)		
+			message = 'SMIRC: %s' % (self.body)		
 		else:
 			if self.room is None:
 				raise FieldError('null message room')
 			if self.user is None:
 				raise FieldError('null message sender')
-			message = '%s@%s: %s' % (self.user.name, self.room.name, message)
+			message = '%s@%s: %s' % (self.user.name, self.room.name, self.body)
 		message = message[:140]
 		return self.raw_send(phone_number, message)
 
