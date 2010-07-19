@@ -18,8 +18,6 @@ import os
 import pyinotify
 import sys
 from django.conf import settings
-from smirc.chat.models import Room
-from smirc.chat.models import UserProfile
 from smirc.message.models import SMSToolsMessage
 
 __version__ = '$Rev$'
@@ -27,13 +25,23 @@ __version__ = '$Rev$'
 class SMSFileHandler(pyinotify.ProcessEvent):
 	def process_IN_CLOSE_WRITE(self, event):
 		logging.debug('event IN_CLOSE_WRITE occurred for %s' % event.pathname)
+		message = SMSToolsMessage()
 		try:
-			with open(event.pathname, 'r') as f:
-				data = f.read()
-			message = Message()
-			message.parse(data)
-		except IOError, e:
-			logging.error('error reading file: %s', str(e))
+			message.receive(event.pathname)
+			if (message.command):
+				# TODO: deal with the command message.command (arguments are in message.body)
+			else:
+				# TODO: deal with the message in message.body, send by message.user to message.room
+		except FieldError, e:
+			if message.user:
+				response = SMSToolsMessage()
+				response.body = str(e)
+				response.system = True
+				response.send(message.user.profile.phone_number)
+			else:
+				logging.warning('FieldError receiving message %s: %s' % (event.pathname, str(e)))
+		except Exception, e:
+			logging.error('unhandled exception occurred while receiving message %s: %s' % (event.pathname, str(e))
 
 def smircd_sanity_check():
 	errors = 0
