@@ -39,9 +39,9 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 				response.system = True
 				response.send(message.user.profile.phone_number)
 			else:
-				logging.warning('FieldError receiving message %s: %s' % (event.pathname, str(e)))
+				logging.warning('fielderror exception occurred while receiving message %s: %s' % (event.pathname, str(e)))
 		except Exception, e:
-			logging.error('unhandled exception occurred while receiving message %s: %s' % (event.pathname, str(e))
+			logging.error('unknown exception occurred while receiving message %s: %s' % (event.pathname, str(e))
 
 def smircd_sanity_check():
 	errors = 0
