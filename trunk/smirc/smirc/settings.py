@@ -21,6 +21,7 @@ DATABASES = {
 		'NAME': 'smirc',                      # Or path to database file if using sqlite3.
 		'USER': 'smirc',                      # Not used with sqlite3.
 		'PASSWORD': 'fBzeaG3oWUl1X1OdChb7',   # Not used with sqlite3.
+		'TEST_NAME': 'smirc_test',            # The database that will be used for running tests.
 		'HOST': '',                           # Set to empty string for localhost. Not used with sqlite3.
 		'PORT': '',                           # Set to empty string for default. Not used with sqlite3.
 		'OPTIONS': {
