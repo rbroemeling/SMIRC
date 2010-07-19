@@ -9,6 +9,7 @@ from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
 	body = None
+	command = None
 	room = models.ForeignKey(Room)
 	system = False	
 	user = models.ForeignKey(User)
@@ -24,33 +25,35 @@ class MessageSkeleton(models.Model):
 			raise FieldError('unknown message sender: %s' % (phone_number))
 		self.user = profile.user
 
-		if body:
-			command_match = re.match('\s*/(\S+)\s*', body)
-			if command_match:
-				command = command_match.group(1)
-				command_body = body[command_match.end()+1:]
-				return
+		if body is None:
+			raise FieldError('null message body')
+		body = body.strip()
+		if body == '':
+			raise FieldError('empty message body')
 
-			room_match = re.match('\s*@(\S+)\s*', body)
+		command_match = re.match('^/(\S*)\s*(.*)', body)
+		if command_match:
+			self.command = command_match.group(1)
+			body = command_match.group(2)
+		else:
+			room_match = re.match('^@(\S*)\s*(.*)', body)
 			if room_match:
 				room = room_match.group(1)
-				body = body[room_match.end()+1:]
+				body = room_match.group(2)
 				try:
 					self.room = Room.objects.get(name__iexact=room, users__user__id__exact=self.user.id)
+					if profile.room != self.room:
+						profile.room = self.room
+						profile.save()
 				except Room.DoesNotExist:
 					raise FieldError('unknown message room: %s' % (room))
-				if profile.room != self.room:
-					profile.room = self.room
-					profile.save()
 			else:
 				if profile.room:
 					self.room = profile.room
-			self.body = body
+			if self.room is None:
+				raise FieldError('no target room defined and no default room found')
 
-		if self.body is None:
-			raise FieldError('null message body')
-		if self.room is None:
-			raise FieldError('no target room defined and no default room found')
+		self.body = body
 		self.save()
 
 	def send(self, phone_number, message):
