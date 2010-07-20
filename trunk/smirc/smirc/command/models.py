@@ -40,6 +40,7 @@ class SmircCommand:
 				raise SmircCommandException('room %s not found' % (room))
 			else:
 				if room.owner == self.executing_user:
+					# TODO: check whether user is already in room
 					# TODO: invite user to room
 				else:
 					raise SmircCommandException('you do not own room %s', % (room))
@@ -56,14 +57,23 @@ class SmircCommand:
 
 		*KICK [user to kick] [room you own]
 		"""
+		# TODO: intertwine this with cmd_invite, as they do basically the same thing.
+		# Maybe outsource it to a private function?
 		pass
 
-	def cmd_nick(self, room):
+	def cmd_nick(self, new_user):
 		"""Change your user nickname.
 
 		*NICK [new user nickname]
 		"""
-		pass
+		try:
+			Convenience.load_user(new_user)
+		except User.DoesNotExist:
+			# TODO: check new_user to see if it follows naming requirements
+			self.executing_user.name = new_user
+			self.executing_user.save()
+		else:
+			raise SmircCommandException('user nickname %s is already in use' % (new_user))
 
 	def cmd_part(self, room):
 		"""Leave a chat room that you're currently in.
