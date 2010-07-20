@@ -23,7 +23,8 @@ class MessageSkeleton(models.Model):
 			profile = UserProfile.objects.get(phone_number=phone_number)
 		except UserProfile.DoesNotExist:
 			raise FieldError('unknown message sender: %s' % (phone_number))
-		self.user = profile.user
+		else:
+			self.user = profile.user
 
 		if body is None:
 			raise FieldError('null message body')
@@ -31,7 +32,7 @@ class MessageSkeleton(models.Model):
 		if body == '':
 			raise FieldError('empty message body')
 
-		command_match = re.match('^/(\S*)\s*(.*)', body)
+		command_match = re.match('^\*([A-Za-z]*)\s*(.*)', body)
 		if command_match:
 			self.command = command_match.group(1)
 			body = command_match.group(2)
@@ -42,11 +43,12 @@ class MessageSkeleton(models.Model):
 				body = room_match.group(2)
 				try:
 					self.room = Room.objects.get(name__iexact=room, users__user__id__exact=self.user.id)
+				except Room.DoesNotExist:
+					raise FieldError('unknown message room: %s' % (room))
+				else:
 					if profile.room != self.room:
 						profile.room = self.room
 						profile.save()
-				except Room.DoesNotExist:
-					raise FieldError('unknown message room: %s' % (room))
 			else:
 				if profile.room:
 					self.room = profile.room
@@ -92,10 +94,11 @@ class SMSToolsMessage(MessageSkeleton):
 		except IOError, e:
 			logging.warning('I/O error encountered attempting to read file: %s' % (str(e)))
 			pass
-		if headers.has_key('from'):
-			return (headers['from'], body)
 		else:
-			return (None, body)
+			if headers.has_key('from'):
+				return (headers['from'], body)
+			else:
+				return (None, body)
 
 	def raw_send(self, phone_number, message):
 		tempfile.tempdir = settings.SMSTOOLS['outbound_dir']
