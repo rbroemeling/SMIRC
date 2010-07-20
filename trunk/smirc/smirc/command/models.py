@@ -61,19 +61,19 @@ class SmircCommand:
 		# Maybe outsource it to a private function?
 		pass
 
-	def cmd_nick(self, new_user):
+	def cmd_nick(self, new_username):
 		"""Change your user nickname.
 
 		*NICK [new user nickname]
 		"""
 		try:
-			Convenience.load_user(new_user)
+			Convenience.load_user(new_username)
 		except User.DoesNotExist:
-			# TODO: check new_user to see if it follows naming requirements
-			self.executing_user.name = new_user
+			# TODO: check new_username to see if it follows naming requirements
+			self.executing_user.username = new_username
 			self.executing_user.save()
 		else:
-			raise SmircCommandException('user nickname %s is already in use' % (new_user))
+			raise SmircCommandException('user nickname %s is already in use' % (new_username))
 
 	def cmd_part(self, room):
 		"""Leave a chat room that you're currently in.

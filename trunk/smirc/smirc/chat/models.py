@@ -63,7 +63,7 @@ class Membership(models.Model):
 	voice = models.BooleanField()
 
 	def __unicode__(self):
-		return '%s:%s' % (room.name, user.name)
+		return '%s:%s' % (room.name, user.username)
 
 # Add a user profile to the Django User model so that we can
 # add on our own fields/user data as necessary.

@@ -63,7 +63,7 @@ class MessageSkeleton(models.Model):
 				raise FieldError('null message room')
 			if self.user is None:
 				raise FieldError('null message sender')
-			message = '%s@%s: %s' % (self.user.name, self.room.name, self.body)
+			message = '%s@%s: %s' % (self.user.username, self.room.name, self.body)
 		message = message[:140]
 		return self.raw_send(phone_number, message)
 
