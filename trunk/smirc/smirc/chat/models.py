@@ -8,6 +8,8 @@ class Convenience:
 
 		Raises Room.DoesNotExist if the requested room cannot be found.
 		"""
+		if r is None:
+			raise Room.DoesNotExist
 		if isinstance(r, Room):
 			return r
 		assert type(r) == 'str'
@@ -24,6 +26,8 @@ class Convenience:
 
 		Raises User.DoesNotExist if the user cannot be found.
 		"""
+		if u is None:
+			raise User.DoesNotExist
 		if isinstance(u, User):
 			return u
 		if isinstance(u, UserProfile):
