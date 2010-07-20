@@ -4,8 +4,8 @@ import tempfile
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
+from smirc.chat.models import Convenience
 from smirc.chat.models import Room
-from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
 	body = None
@@ -17,14 +17,10 @@ class MessageSkeleton(models.Model):
 	def receive(self, data):
 		(phone_number, body) = self.raw_receive(data)
 
-		if phone_number is None:
-			raise FieldError('null message sender')
 		try:
-			profile = UserProfile.objects.get(phone_number=phone_number)
-		except UserProfile.DoesNotExist:
+			self.user = Convenience.load_user(phone_number)
+		except User.DoesNotExist:
 			raise FieldError('unknown message sender: %s' % (phone_number))
-		else:
-			self.user = profile.user
 
 		if body is None:
 			raise FieldError('null message body')
@@ -42,16 +38,16 @@ class MessageSkeleton(models.Model):
 				room = room_match.group(1)
 				body = room_match.group(2)
 				try:
-					self.room = Room.objects.get(name__iexact=room, users__user__id__exact=self.user.id)
+					self.room = Convenience.load_room(room, self.user)
 				except Room.DoesNotExist:
 					raise FieldError('unknown message room: %s' % (room))
 				else:
-					if profile.room != self.room:
-						profile.room = self.room
-						profile.save()
+					if self.user.profile.room != self.room:
+						self.user.profile.room = self.room
+						self.user.profile.save()
 			else:
-				if profile.room:
-					self.room = profile.room
+				if self.user.profile.room:
+					self.room = self.user.profile.room
 			if self.room is None:
 				raise FieldError('no target room defined and no default room found')
 
