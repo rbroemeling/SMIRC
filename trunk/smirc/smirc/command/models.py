@@ -1,3 +1,10 @@
+class SmircCommandException(Exception):
+	def __init__(self, value):
+		self.value = value
+
+	def __str__(self):
+		return repr(self.value)
+
 class SmircCommand:
 	def cmd_create(self, room):
 		"""Create a new chat room.
@@ -46,7 +53,7 @@ class SmircCommand:
 		try:
 			command = getattr(self, 'cmd_%s' % (message.command.lower()))
 		except AttributeError, e:
-			return 'unknown command "%s"' % (message.command)
+			raise SmircCommandException('unknown command "%s"' % (message.command))
 		else:
 			args = message.body.split()
 			try:
@@ -58,6 +65,6 @@ class SmircCommand:
 					if line[0:1] == '*':
 						usage = line
 				assert usage != ''
-				return 'invalid arguments given - use %s' % (usage)
+				raise SmircCommandException('invalid arguments given, use "%s"' % (usage))
 			else:
 				return result
