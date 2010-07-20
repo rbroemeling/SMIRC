@@ -1,3 +1,7 @@
+from django.contrib.auth.models import User
+from smirc.chat.models import Convenience
+from smirc.chat.models import Room
+
 class SmircCommandException(Exception):
 	def __init__(self, value):
 		self.value = value
@@ -6,20 +10,40 @@ class SmircCommandException(Exception):
 		return repr(self.value)
 
 class SmircCommand:
+	executing_user = None
+
 	def cmd_create(self, room):
 		"""Create a new chat room.
 
 		*CREATE [room to create]
 		"""
-		pass
+		try:
+			Convenience.load_room(room, self.executing_user)
+		except Room.DoesNotExist:
+			# TODO: create the requested room.
+		else:
+			raise SmircCommandException('room %s already exists' % (room))
 
 	def cmd_invite(self, user, room):
 		"""Invite a user to a chat room that you control.
 
 		*INVITE [user to be invited] [room you own]
 		"""
-		pass
-	
+		try:
+			user = Convenience.load_user(user)
+		except User.DoesNotExist:
+			raise SmircCommandException('user %s not found' % (user))
+		else:
+			try:
+				room = Convenience.load_room(room, self.executing_user)
+			except Room.DoesNotExist:
+				raise SmircCommandException('room %s not found' % (room))
+			else:
+				if room.owner == self.executing_user:
+					# TODO: invite user to room
+				else:
+					raise SmircCommandException('you do not own room %s', % (room))
+
 	def cmd_join(self, room):
 		"""Join a chat room that you've been invited to.
 
@@ -49,7 +73,7 @@ class SmircCommand:
 		pass
 	
 	def execute(message):
-		# execute message.command(message.body) by message.user
+		self.executing_user = message.user
 		try:
 			command = getattr(self, 'cmd_%s' % (message.command.lower()))
 		except AttributeError, e:
@@ -57,7 +81,7 @@ class SmircCommand:
 		else:
 			args = message.body.split()
 			try:
-				result = command(*args)
+				return command(*args)
 			except TypeError, e:
 				usage = ''
 				for line in command.__doc__.splitlines():
@@ -66,5 +90,3 @@ class SmircCommand:
 						usage = line
 				assert usage != ''
 				raise SmircCommandException('invalid arguments given, use "%s"' % (usage))
-			else:
-				return result
