@@ -1,6 +1,44 @@
 from django.contrib.auth.models import User
 from django.db import models
 
+class Convenience:
+	@staticmethod
+	def load_room(r, u):
+		"""A convenience method to load a given chat room.
+
+		Raises Room.DoesNotExist if the requested room cannot be found.
+		"""
+		if isinstance(r, Room):
+			return r
+		assert type(r) == 'str'
+		try:
+			u = Convenience.load_user(u)
+		except User.DoesNotExist:
+			raise Room.DoesNotExist
+		else:
+			return Room.objects.get(name__iexact=r, users__user__id__exact=u.id)
+
+	@staticmethod
+	def load_user(u):
+		"""A convenience method to load a given user.
+
+		Raises User.DoesNotExist if the user cannot be found.
+		"""
+		if isinstance(u, User):
+			return u
+		if isinstance(u, UserProfile):
+			return u.user
+		assert type(u) == 'str'
+		if re.match('^[0-9]+$', u):
+			try:
+				profile = UserProfile.objects.get(phone_number=u)
+			except UserProfile.DoesNotExist:
+				raise User.DoesNotExist
+			else:
+				return profile.user
+		else:
+			return  User.objects.get(name=u)
+
 class Room(models.Model):
 	class Meta:
 		unique_together = (('owner','name'))
