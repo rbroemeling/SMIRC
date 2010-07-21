@@ -1,59 +1,61 @@
 from django.contrib.auth.models import User
 from django.db import models
 
-class Room(models.Model):
+class Conversation(models.Model):
 	class Meta:
 		unique_together = (('owner','name'))
 
 	name = models.CharField(max_length=16, db_index=True)
 	owner = models.ForeignKey(User)
-	users = models.ManyToManyField(User, related_name='rooms', through='Membership')
+	topic = models.CharField(max_length=64)
+	users = models.ManyToManyField(User, related_name='conversations', through='Membership')
 
 	def __unicode__(self):
 		return self.name
 
 	@staticmethod
-	def load_room(r, u):
-		"""A convenience method to load a given chat room.
+	def load_conversation(c, u):
+		"""A convenience method to load a given conversation.
 
-		Raises Room.DoesNotExist if the requested room cannot be found.
+		Raises Conversation.DoesNotExist if the requested conversation cannot be found.
 		"""
-		if r is None:
-			raise Room.DoesNotExist
-		if isinstance(r, Room):
-			return r
-		assert type(r) == 'str'
+		if c is None:
+			raise Conversation.DoesNotExist
+		if isinstance(c, Conversation):
+			return c
+		assert type(c) == 'str'
 		try:
 			u = UserProfile.load_user(u)
 		except User.DoesNotExist:
-			raise Room.DoesNotExist
+			raise Conversation.DoesNotExist
 		else:
-			return Room.objects.get(name__iexact=r, users__user__id__exact=u.id)
+			return Conversation.objects.get(name__iexact=r, users__user__id__exact=u.id)
 
 class Invitation(models.Model):
 	class Meta:
-		unique_together = (('user','room'))
+		unique_together = (('user','conversation'))
 
+	invited_by = models.ForeignKey(User)
 	user = models.ForeignKey(User)
-	room = models.ForeignKey(Room)
+	conversation = models.ForeignKey(Conversation)
 
 class Membership(models.Model):
 	class Meta:
-		unique_together = (('user','room'))
+		unique_together = (('user','conversation'))
 
 	user = models.ForeignKey(User)
-	room = models.ForeignKey(Room)
+	conversation = models.ForeignKey(Conversation)
 	voice = models.BooleanField()
 
 	def __unicode__(self):
-		return '%s:%s' % (room.name, user.username)
+		return '%s:%s' % (conversation.name, user.username)
 
 # Add a user profile to the Django User model so that we can
 # add on our own fields/user data as necessary.
 # Technique taken from:
 #    http://www.b-list.org/weblog/2006/jun/06/django-tips-extending-user-model/
 class UserProfile(models.Model):
-	last_active_room = models.ForeignKey(Room)
+	last_active_conversation = models.ForeignKey(Conversation)
 	phone_number = models.BigIntegerField(primary_key=True)
 	user = models.ForeignKey(User, unique=True)
 
