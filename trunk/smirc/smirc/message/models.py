@@ -10,6 +10,7 @@ from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
 	body = None
+	command = False
 	sender = models.ForeignKey(Membership)
 	system = False
 
@@ -27,12 +28,10 @@ class MessageSkeleton(models.Model):
 		if body == '':
 			raise FieldError('empty message body')
 
-		# TODO: deal with commands somehow
-		#command_match = re.match('^\*([A-Za-z]*)\s*(.*)', body)
-		#if command_match:
-		#	self.command = command_match.group(1)
-		#	body = command_match.group(2)
-		#else:
+		self.command = SmircCommand.handle(body)
+		if self.command:
+			return
+
 		conversation_match = re.match('^@(\S*)\s*(.*)', body)
 		if conversation_match:
 			conversation_identifier = conversation_match.group(1)
@@ -49,6 +48,7 @@ class MessageSkeleton(models.Model):
 
 		self.body = body
 		# TODO: remember to update self.sender.last_active timestamp
+		return self
 
 	def send(self, phone_number):
 		if self.body is None:
