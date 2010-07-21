@@ -10,16 +10,14 @@ from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
 	body = None
-	command = None
-	conversation = models.ForeignKey(Conversation)
+	sender = models.ForeignKey(Membership)
 	system = False
-	user = models.ForeignKey(User)
 
 	def receive(self, data):
 		(phone_number, body) = self.raw_receive(data)
 
 		try:
-			self.user = UserProfile.load_user(phone_number)
+			user = UserProfile.load_user(phone_number)
 		except User.DoesNotExist:
 			raise FieldError('unknown message sender: %s' % (phone_number))
 
@@ -29,30 +27,28 @@ class MessageSkeleton(models.Model):
 		if body == '':
 			raise FieldError('empty message body')
 
-		command_match = re.match('^\*([A-Za-z]*)\s*(.*)', body)
-		if command_match:
-			self.command = command_match.group(1)
-			body = command_match.group(2)
+		# TODO: deal with commands somehow
+		#command_match = re.match('^\*([A-Za-z]*)\s*(.*)', body)
+		#if command_match:
+		#	self.command = command_match.group(1)
+		#	body = command_match.group(2)
+		#else:
+		conversation_match = re.match('^@(\S*)\s*(.*)', body)
+		if conversation_match:
+			conversation_identifier = conversation_match.group(1)
+			body = conversation_match.group(2)
+			try:
+				self.sender = Membership.load_membership(user, conversation_identifier)
+			except Membership.DoesNotExist:
+				raise FieldError('you are not involved in a conversation named %s' % (conversation_identifier))
 		else:
-			conversation_match = re.match('^@(\S*)\s*(.*)', body)
-			if conversation_match:
-				conversation = conversation_match.group(1)
-				body = conversation_match.group(2)
-				try:
-					self.conversation = Conversation.load_conversation(conversation, self.user)
-				except Conversation.DoesNotExist:
-					raise FieldError('unknown conversation: %s' % (conversation))
-				else:
-					if self.user.profile.last_active_conversation != self.conversation:
-						self.user.profile.last_active_conversation = self.conversation
-						self.user.profile.save()
-			else:
-				if self.user.profile.last_active_conversation:
-					self.conversation = self.user.profile.last_active_conversation
-			if self.conversation is None:
-				raise FieldError('no target conversation defined and no default conversation found')
+			# TODO: load user's last active membership (if any) and use it as
+			#       self.sender
+		if self.conversation is None:
+			raise FieldError('no target conversation defined and no default conversation found')
 
 		self.body = body
+		# TODO: remember to update self.sender.last_active timestamp
 
 	def send(self, phone_number):
 		if self.body is None:

@@ -20,17 +20,18 @@ class SmircCommand:
 		*CREATE [conversation name]
 		"""
 		try:
-			Conversation.load_conversation(conversation_identifier, self.executing_user)
-		except Conversation.DoesNotExist:
+			Membership.load_membership(self.executing_user, conversation_identifier)
+		except Membership.DoesNotExist:
 			c = Conversation()
 			c.name = conversation_identifier
 			c.save()
 			m = Membership()
 			m.conversation = c
+			m.last_active = datetime.datetime()
 			m.mode_operator = True
 			m.user = self.executing_user
 			m.save()
-			return 'you have created the conversation %s' % (c.name)
+			return 'you have created a conversation named %s' % (c.name)
 		else:
 			raise SmircCommandException('you are already taking part in a conversation named %s' % (conversation_identifier))
 
@@ -45,31 +46,31 @@ class SmircCommand:
 			raise SmircCommandException('user %s not found' % (user_identifier))
 		else:
 			try:
-				conversation = Conversation.load_conversation(conversation_identifier, self.executing_user)
-			except Conversation.DoesNotExist:
-				raise SmircCommandException('conversation %s not found' % (conversation_identifier))
+				membership = Membership.load_membership(self.executing_user, conversation_identifier)
+			except Membership.DoesNotExist:
+				raise SmircCommandException('you are not involved in a conversation named %s' % (conversation_identifier))
 			else:
-				if conversation.owner == self.executing_user:
+				if not membership.mode_operator:
+					raise SmircCommandException('you are not an operator of the conversation named %s' % (conversation_identifier))
+				else:
 					try:
-						Invitation.objects.get(conversation=conversation, user=user)
+						Invitation.objects.get(conversation=membership.conversation, invitee=user)
 					except Invitation.DoesNotExist:
 						pass
 					else:
 						raise SmircCommandException('user %s has already been invited to conversation %s' % (user, conversation))
 					try:
-						Membership.objects.get(conversation=conversation, user=user)
+						Membership.load_membership(user, conversation_identifier)
 					except Membership.DoesNotExist:
 						pass
 					else:
-						raise SmircCommandException('user %s is already a member of conversation %s' % (user, conversation))
+						raise SmircCommandException('user %s is already in a conversation named %s' % (conversation_identifier))			
 					i = Invitation()
-					i.user = user
-					i.conversation = conversation
+					i.invitee = user
+					i.inviter = self.executing_user
+					i.conversation = membership.conversation
 					i.save()
 					# TODO: send message to user about their invitation to conversation
-					
-				else:
-					raise SmircCommandException('you do not own conversation %s', % (conversation))
 
 	def cmd_join(self, conversation):
 		"""Join a chat conversation that you've been invited to.

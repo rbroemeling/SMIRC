@@ -9,25 +9,6 @@ class Conversation(models.Model):
 	def __unicode__(self):
 		return self.name
 
-	@staticmethod
-	def load_conversation(c, u):
-		"""A convenience method to load a given conversation, given some
-		identifying information about the conversation and a participant user.
-
-		Raises Conversation.DoesNotExist if the requested conversation cannot be found.
-		"""
-		if c is None:
-			raise Conversation.DoesNotExist
-		if isinstance(c, Conversation):
-			return c
-		assert type(c) == 'str'
-		try:
-			u = UserProfile.load_user(u)
-		except User.DoesNotExist:
-			raise Conversation.DoesNotExist
-		else:
-			return Conversation.objects.get(name__iexact=c, users__user__id__exact=u.id)
-
 class Invitation(models.Model):
 	class Meta:
 		unique_together = (('invitee','conversation'))
@@ -41,6 +22,7 @@ class Membership(models.Model):
 		unique_together = (('user','conversation'))
 
 	conversation = models.ForeignKey(Conversation)
+	last_active = models.DateTimeField()
 	mode_operator = models.BooleanField()
 	mode_voice = models.BooleanField()
 	user = models.ForeignKey(User)
@@ -48,12 +30,30 @@ class Membership(models.Model):
 	def __unicode__(self):
 		return '%s:%s' % (conversation.name, user.username)
 
+	@staticmethod
+	def load_membership(u, c):
+		"""A convenience method to load a given membership, given some
+		identifying information about the conversation and a participant user.
+
+		Raises Membership.DoesNotExist if the requested membership cannot be found.
+		"""
+		if c is None:
+			raise Conversation.DoesNotExist
+		if isinstance(c, Membership):
+			return c
+		assert type(c) == 'str'
+		try:
+			u = UserProfile.load_user(u)
+		except User.DoesNotExist:
+			raise Membership.DoesNotExist
+		else:
+			return Membership.objects.get(conversation__name__iexact=c, user__id__exact=u.id)
+
 # Add a user profile to the Django User model so that we can
 # add on our own fields/user data as necessary.
 # Technique taken from:
 #    http://www.b-list.org/weblog/2006/jun/06/django-tips-extending-user-model/
 class UserProfile(models.Model):
-	last_active_conversation = models.ForeignKey(Conversation)
 	phone_number = models.BigIntegerField(primary_key=True)
 	user = models.ForeignKey(User, unique=True)
 
