@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
 from smirc.chat.models import Convenience
+from smirc.chat.models import Invitation
+from smirc.chat.models import Membership
 from smirc.chat.models import Room
 
 class SmircCommandException(Exception):
@@ -20,7 +22,16 @@ class SmircCommand:
 		try:
 			Convenience.load_room(room, self.executing_user)
 		except Room.DoesNotExist:
-			# TODO: create the requested room.
+			r = Room()
+			r.name = room
+			r.owner = self.executing_user
+			r.save()
+			m = Membership()
+			m.user = self.executing_user
+			m.room = r
+			m.voice = True
+			m.save()
+			return 'you have created the room %s' % (r.name)
 		else:
 			raise SmircCommandException('room %s already exists' % (room))
 
@@ -40,8 +51,24 @@ class SmircCommand:
 				raise SmircCommandException('room %s not found' % (room))
 			else:
 				if room.owner == self.executing_user:
-					# TODO: check whether user is already in room
-					# TODO: invite user to room
+					try:
+						Invitation.objects.get(room=room, user=user)
+					except Invitation.DoesNotExist:
+						pass
+					else:
+						raise SmircCommandException('user %s has already been invited to room %s' % (user, room))
+					try:
+						Membership.objects.get(room=room, user=user)
+					except Membership.DoesNotExist:
+						pass
+					else:
+						raise SmircCommandException('user %s is already a member of room %s' % (user, room))
+					i = Invitation()
+					i.user = user
+					i.room = room
+					i.save()
+					# TODO: send message to user about their invitation to room
+					
 				else:
 					raise SmircCommandException('you do not own room %s', % (room))
 
@@ -81,7 +108,7 @@ class SmircCommand:
 		*PART [room you are in]
 		"""
 		pass
-	
+
 	def execute(message):
 		self.executing_user = message.user
 		try:

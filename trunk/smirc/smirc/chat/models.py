@@ -54,6 +54,13 @@ class Room(models.Model):
 	def __unicode__(self):
 		return self.name
 
+class Invitation(models.Model):
+	class Meta:
+		unique_together = (('user','room'))
+
+	user = models.ForeignKey(User)
+	room = models.ForeignKey(Room)
+
 class Membership(models.Model):
 	class Meta:
 		unique_together = (('user','room'))
