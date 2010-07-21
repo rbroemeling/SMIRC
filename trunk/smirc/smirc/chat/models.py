@@ -37,17 +37,18 @@ class Membership(models.Model):
 
 		Raises Membership.DoesNotExist if the requested membership cannot be found.
 		"""
-		if c is None:
-			raise Conversation.DoesNotExist
+		if u is None or c is None:
+			raise Membership.DoesNotExist
 		if isinstance(c, Membership):
 			return c
-		assert type(c) == 'str'
 		try:
 			u = UserProfile.load_user(u)
 		except User.DoesNotExist:
 			raise Membership.DoesNotExist
-		else:
+		if type(c) == 'str':
 			return Membership.objects.get(conversation__name__iexact=c, user__id__exact=u.id)
+		elif type(c) == 'instance' and isinstance(c, Conversation):
+			return Membership.objects.get(conversation__id__exact=c.id, user__id__exact=u.id)
 
 # Add a user profile to the Django User model so that we can
 # add on our own fields/user data as necessary.
