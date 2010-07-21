@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
+from smirc.chat.models import Conversation
 from smirc.chat.models import Invitation
 from smirc.chat.models import Membership
-from smirc.chat.models import Room
 from smirc.chat.models import UserProfile
 
 class SmircCommandException(Exception):
@@ -14,31 +14,31 @@ class SmircCommandException(Exception):
 class SmircCommand:
 	executing_user = None
 
-	def cmd_create(self, room):
-		"""Create a new chat room.
+	def cmd_create(self, conversation):
+		"""Create a new conversation.
 
-		*CREATE [room to create]
+		*CREATE [conversation name]
 		"""
 		try:
-			Room.load_room(room, self.executing_user)
-		except Room.DoesNotExist:
-			r = Room()
-			r.name = room
-			r.owner = self.executing_user
-			r.save()
+			Conversation.load_conversation(conversation, self.executing_user)
+		except Conversation.DoesNotExist:
+			c = Conversation()
+			c.name = conversation
+			c.owner = self.executing_user
+			c.save()
 			m = Membership()
 			m.user = self.executing_user
-			m.room = r
+			m.conversation = c
 			m.voice = True
 			m.save()
-			return 'you have created the room %s' % (r.name)
+			return 'you have created the conversation %s' % (r.name)
 		else:
-			raise SmircCommandException('room %s already exists' % (room))
+			raise SmircCommandException('you are already taking part in a conversation named %s' % (conversation))
 
-	def cmd_invite(self, user, room):
-		"""Invite a user to a chat room that you control.
+	def cmd_invite(self, user, conversation):
+		"""Invite a user to a conversation that you have ops on.
 
-		*INVITE [user to be invited] [room you own]
+		*INVITE [user to be invited] [conversation]
 		"""
 		try:
 			user = UserProfile.load_user(user)
@@ -46,43 +46,43 @@ class SmircCommand:
 			raise SmircCommandException('user %s not found' % (user))
 		else:
 			try:
-				room = Room.load_room(room, self.executing_user)
-			except Room.DoesNotExist:
-				raise SmircCommandException('room %s not found' % (room))
+				conversation = Conversation.load_conversation(conversation, self.executing_user)
+			except Conversation.DoesNotExist:
+				raise SmircCommandException('conversation %s not found' % (conversation))
 			else:
-				if room.owner == self.executing_user:
+				if conversation.owner == self.executing_user:
 					try:
-						Invitation.objects.get(room=room, user=user)
+						Invitation.objects.get(conversation=conversation, user=user)
 					except Invitation.DoesNotExist:
 						pass
 					else:
-						raise SmircCommandException('user %s has already been invited to room %s' % (user, room))
+						raise SmircCommandException('user %s has already been invited to conversation %s' % (user, conversation))
 					try:
-						Membership.objects.get(room=room, user=user)
+						Membership.objects.get(conversation=conversation, user=user)
 					except Membership.DoesNotExist:
 						pass
 					else:
-						raise SmircCommandException('user %s is already a member of room %s' % (user, room))
+						raise SmircCommandException('user %s is already a member of conversation %s' % (user, conversation))
 					i = Invitation()
 					i.user = user
-					i.room = room
+					i.conversation = conversation
 					i.save()
-					# TODO: send message to user about their invitation to room
+					# TODO: send message to user about their invitation to conversation
 					
 				else:
-					raise SmircCommandException('you do not own room %s', % (room))
+					raise SmircCommandException('you do not own conversation %s', % (conversation))
 
-	def cmd_join(self, room):
-		"""Join a chat room that you've been invited to.
+	def cmd_join(self, conversation):
+		"""Join a chat conversation that you've been invited to.
 
-		*JOIN [room you are invited to]
+		*JOIN [conversation you are invited to]
 		"""
 		pass
 
-	def cmd_kick(self, user, room):
-		"""Kick a user out of a chat room that you control.
+	def cmd_kick(self, user, conversation):
+		"""Kick a user out of a conversation that you control.
 
-		*KICK [user to kick] [room you own]
+		*KICK [user to kick] [conversation you own]
 		"""
 		# TODO: intertwine this with cmd_invite, as they do basically the same thing.
 		# Maybe outsource it to a private function?
@@ -102,10 +102,10 @@ class SmircCommand:
 		else:
 			raise SmircCommandException('user nickname %s is already in use' % (new_username))
 
-	def cmd_part(self, room):
-		"""Leave a chat room that you're currently in.
+	def cmd_part(self, conversation):
+		"""Leave a chat conversation that you're currently in.
 
-		*PART [room you are in]
+		*PART [conversation you are in]
 		"""
 		pass
 

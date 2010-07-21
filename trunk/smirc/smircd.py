@@ -48,7 +48,7 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 					response.body = str(e)
 				response.system = True
 			else:
-				# TODO: deal with the message in message.body, sent by message.user to message.room
+				# TODO: deal with the message in message.body, sent by message.user to message.conversation
 		if receive_exception:
 			logging.warning('unhandled exception occurred while receiving message %s: %s' % (event.pathname, str(receive_exception))
 		if response.body:

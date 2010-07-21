@@ -4,14 +4,14 @@ import tempfile
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
-from smirc.chat.models import Room
+from smirc.chat.models import Conversation
 from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
 	body = None
 	command = None
-	room = models.ForeignKey(Room)
-	system = False	
+	conversation = models.ForeignKey(conversation)
+	system = False
 	user = models.ForeignKey(User)
 
 	def receive(self, data):
@@ -33,23 +33,23 @@ class MessageSkeleton(models.Model):
 			self.command = command_match.group(1)
 			body = command_match.group(2)
 		else:
-			room_match = re.match('^@(\S*)\s*(.*)', body)
-			if room_match:
-				room = room_match.group(1)
-				body = room_match.group(2)
+			conversation_match = re.match('^@(\S*)\s*(.*)', body)
+			if conversation_match:
+				conversation = conversation_match.group(1)
+				body = conversation_match.group(2)
 				try:
-					self.room = Room.load_room(room, self.user)
-				except Room.DoesNotExist:
-					raise FieldError('unknown message room: %s' % (room))
+					self.conversation = Conversation.load_conversation(conversation, self.user)
+				except Conversation.DoesNotExist:
+					raise FieldError('unknown conversation: %s' % (conversation))
 				else:
-					if self.user.profile.room != self.room:
-						self.user.profile.room = self.room
+					if self.user.profile.last_active_conversation != self.conversation:
+						self.user.profile.last_active_conversation = self.conversation
 						self.user.profile.save()
 			else:
-				if self.user.profile.room:
-					self.room = self.user.profile.room
-			if self.room is None:
-				raise FieldError('no target room defined and no default room found')
+				if self.user.profile.last_active_conversation:
+					self.conversation = self.user.profile.last_active_conversation
+			if self.conversation is None:
+				raise FieldError('no target conversation defined and no default conversation found')
 
 		self.body = body
 
@@ -59,11 +59,11 @@ class MessageSkeleton(models.Model):
 		if self.system:
 			message = 'SMIRC: %s' % (self.body)		
 		else:
-			if self.room is None:
-				raise FieldError('null message room')
+			if self.conversation is None:
+				raise FieldError('null message conversation')
 			if self.user is None:
 				raise FieldError('null message sender')
-			message = '%s@%s: %s' % (self.user.username, self.room.name, self.body)
+			message = '%s@%s: %s' % (self.user.username, self.conversation.name, self.body)
 		message = message[:140]
 		return self.raw_send(phone_number, message)
 
