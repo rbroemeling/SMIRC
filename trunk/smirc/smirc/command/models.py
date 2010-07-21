@@ -14,41 +14,40 @@ class SmircCommandException(Exception):
 class SmircCommand:
 	executing_user = None
 
-	def cmd_create(self, conversation):
+	def cmd_create(self, conversation_identifier):
 		"""Create a new conversation.
 
 		*CREATE [conversation name]
 		"""
 		try:
-			Conversation.load_conversation(conversation, self.executing_user)
+			Conversation.load_conversation(conversation_identifier, self.executing_user)
 		except Conversation.DoesNotExist:
 			c = Conversation()
-			c.name = conversation
-			c.owner = self.executing_user
+			c.name = conversation_identifier
 			c.save()
 			m = Membership()
-			m.user = self.executing_user
 			m.conversation = c
-			m.voice = True
+			m.mode_operator = True
+			m.user = self.executing_user
 			m.save()
-			return 'you have created the conversation %s' % (r.name)
+			return 'you have created the conversation %s' % (c.name)
 		else:
-			raise SmircCommandException('you are already taking part in a conversation named %s' % (conversation))
+			raise SmircCommandException('you are already taking part in a conversation named %s' % (conversation_identifier))
 
-	def cmd_invite(self, user, conversation):
-		"""Invite a user to a conversation that you have ops on.
+	def cmd_invite(self, user_identifier, conversation_identifier):
+		"""Invite a user to a conversation that you are an operator of.
 
-		*INVITE [user to be invited] [conversation]
+		*INVITE [user to be invited] [conversation name]
 		"""
 		try:
-			user = UserProfile.load_user(user)
+			user = UserProfile.load_user(user_identifier)
 		except User.DoesNotExist:
-			raise SmircCommandException('user %s not found' % (user))
+			raise SmircCommandException('user %s not found' % (user_identifier))
 		else:
 			try:
-				conversation = Conversation.load_conversation(conversation, self.executing_user)
+				conversation = Conversation.load_conversation(conversation_identifier, self.executing_user)
 			except Conversation.DoesNotExist:
-				raise SmircCommandException('conversation %s not found' % (conversation))
+				raise SmircCommandException('conversation %s not found' % (conversation_identifier))
 			else:
 				if conversation.owner == self.executing_user:
 					try:

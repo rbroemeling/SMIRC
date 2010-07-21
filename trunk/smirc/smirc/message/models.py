@@ -3,6 +3,7 @@ import re
 import tempfile
 from django.db import models
 from django.contrib.auth.models import User
+# TODO: Create our own class of exception, rather than over-loading FieldError
 from django.core.exceptions import FieldError
 from smirc.chat.models import Conversation
 from smirc.chat.models import UserProfile
@@ -10,7 +11,7 @@ from smirc.chat.models import UserProfile
 class MessageSkeleton(models.Model):
 	body = None
 	command = None
-	conversation = models.ForeignKey(conversation)
+	conversation = models.ForeignKey(Conversation)
 	system = False
 	user = models.ForeignKey(User)
 
@@ -88,6 +89,7 @@ class SMSToolsMessage(MessageSkeleton):
 						else:
 							body = ''
 		except IOError, e:
+			# TODO: Ensure that we throw an exception on this error case, map it to some sort of Message.Exception
 			logging.warning('I/O error encountered attempting to read file: %s' % (str(e)))
 			pass
 		else:
@@ -105,6 +107,7 @@ class SMSToolsMessage(MessageSkeleton):
 		f.close()
 		return path
 
+# TODO: Move these unit tests elsewhere.
 import os
 import unittest
 
