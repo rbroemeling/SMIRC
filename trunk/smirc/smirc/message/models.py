@@ -4,8 +4,8 @@ import tempfile
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.exceptions import FieldError
-from smirc.chat.models import Convenience
 from smirc.chat.models import Room
+from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
 	body = None
@@ -18,7 +18,7 @@ class MessageSkeleton(models.Model):
 		(phone_number, body) = self.raw_receive(data)
 
 		try:
-			self.user = Convenience.load_user(phone_number)
+			self.user = UserProfile.load_user(phone_number)
 		except User.DoesNotExist:
 			raise FieldError('unknown message sender: %s' % (phone_number))
 
@@ -38,7 +38,7 @@ class MessageSkeleton(models.Model):
 				room = room_match.group(1)
 				body = room_match.group(2)
 				try:
-					self.room = Convenience.load_room(room, self.user)
+					self.room = Room.load_room(room, self.user)
 				except Room.DoesNotExist:
 					raise FieldError('unknown message room: %s' % (room))
 				else:

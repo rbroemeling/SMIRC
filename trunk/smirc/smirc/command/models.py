@@ -1,8 +1,8 @@
 from django.contrib.auth.models import User
-from smirc.chat.models import Convenience
 from smirc.chat.models import Invitation
 from smirc.chat.models import Membership
 from smirc.chat.models import Room
+from smirc.chat.models import UserProfile
 
 class SmircCommandException(Exception):
 	def __init__(self, value):
@@ -20,7 +20,7 @@ class SmircCommand:
 		*CREATE [room to create]
 		"""
 		try:
-			Convenience.load_room(room, self.executing_user)
+			Room.load_room(room, self.executing_user)
 		except Room.DoesNotExist:
 			r = Room()
 			r.name = room
@@ -41,12 +41,12 @@ class SmircCommand:
 		*INVITE [user to be invited] [room you own]
 		"""
 		try:
-			user = Convenience.load_user(user)
+			user = UserProfile.load_user(user)
 		except User.DoesNotExist:
 			raise SmircCommandException('user %s not found' % (user))
 		else:
 			try:
-				room = Convenience.load_room(room, self.executing_user)
+				room = Room.load_room(room, self.executing_user)
 			except Room.DoesNotExist:
 				raise SmircCommandException('room %s not found' % (room))
 			else:
@@ -94,7 +94,7 @@ class SmircCommand:
 		*NICK [new user nickname]
 		"""
 		try:
-			Convenience.load_user(new_username)
+			UserProfile.load_user(new_username)
 		except User.DoesNotExist:
 			# TODO: check new_username to see if it follows naming requirements
 			self.executing_user.username = new_username
