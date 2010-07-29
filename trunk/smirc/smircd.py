@@ -70,7 +70,7 @@ def signal_handler(signum, frame):
 	elif signum in [ signal.SIGHUP ]:
 		logging.warning('signal_handler ignoring signal %s(%d)' % (sigdesc, signum))
 	else:
-		logging.error('signal_handler received unhandled signal %s(%d)' % (sigdesc, signum))
+		logging.error('signal_handler ignoring unhandled signal %s(%d)' % (sigdesc, signum))
 
 def smircd_sanity_check():
 	errors = 0
