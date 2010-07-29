@@ -65,7 +65,7 @@ def signal_handler(signum, frame):
 			sigdesc = member[0]
 			break
 	if signum in [ signal.SIGINT, signal.SIGTERM, signal.SIGQUIT ]:
-		logging.info('signal_handler received signal %s(%d), setting terminate flag' % (sigdesc, signum))
+		logging.info('signal_handler received signal %s(%d), setting termination flag' % (sigdesc, signum))
 		smircd_terminate = True
 	elif signum in [ signal.SIGHUP ]:
 		logging.warning('signal_handler ignoring signal %s(%d)' % (sigdesc, signum))
@@ -118,6 +118,8 @@ if __name__ == '__main__':
 	notifier = pyinotify.Notifier(watch_manager, sms_file_handler)
 	watch_manager.add_watch(settings.SMSTOOLS['inbound_dir'], pyinotify.IN_CLOSE_WRITE)
 	
+	# TODO: deal with pre-existing files (i.e. files that have already been received and
+	# are sitting on our inbound directory right now.
 	while True:
 		notifier.process_events()
 		if smircd_terminate == True:

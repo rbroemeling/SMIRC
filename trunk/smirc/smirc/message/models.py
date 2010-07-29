@@ -41,10 +41,10 @@ class MessageSkeleton(models.Model):
 			except Membership.DoesNotExist:
 				raise FieldError('you are not involved in a conversation named %s' % (conversation_identifier))
 		else:
-			# TODO: load user's last active membership (if any) and use it as
-			#       self.sender
-		if self.conversation is None:
-			raise FieldError('no target conversation defined and no default conversation found')
+			try:
+				self.sender = Membership.objects.filter(user__id__exact=user.id).order_by('last_active').reverse()[0]
+			except IndexError:
+				raise FieldError('no target conversation defined and no default conversation found')
 
 		self.body = body
 		# TODO: remember to update self.sender.last_active timestamp
