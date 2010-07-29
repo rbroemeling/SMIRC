@@ -6,6 +6,7 @@ from django.contrib.auth.models import User
 # TODO: Create our own class of exception, rather than over-loading FieldError
 from django.core.exceptions import FieldError
 from smirc.chat.models import Conversation
+from smirc.chat.models import Membership
 from smirc.chat.models import UserProfile
 
 class MessageSkeleton(models.Model):
