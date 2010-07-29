@@ -3,7 +3,7 @@ from django.db import models
 
 class Conversation(models.Model):
 	name = models.CharField(max_length=16, db_index=True)
-	topic = models.CharField(max_length=64)
+	topic = models.CharField(max_length=64, default='')
 	users = models.ManyToManyField(User, related_name='conversations', through='Membership')
 
 	def __unicode__(self):
@@ -23,8 +23,8 @@ class Membership(models.Model):
 
 	conversation = models.ForeignKey(Conversation)
 	last_active = models.DateTimeField()
-	mode_operator = models.BooleanField()
-	mode_voice = models.BooleanField()
+	mode_operator = models.BooleanField(default=False)
+	mode_voice = models.BooleanField(default=False)
 	user = models.ForeignKey(User)
 
 	def __unicode__(self):
