@@ -94,7 +94,6 @@ class SmircCommandCreate(SmircCommand):
 			c.save()
 			m = Membership()
 			m.conversation = c
-			m.last_active = datetime.datetime()
 			m.mode_operator = True
 			m.user = executor
 			m.save()

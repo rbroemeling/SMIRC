@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+import datetime
 import re
 
 class RestrictedNameException(Exception):
@@ -41,7 +42,7 @@ class Membership(models.Model):
 		unique_together = (('user','conversation'))
 
 	conversation = models.ForeignKey(Conversation)
-	last_active = models.DateTimeField()
+	last_active = models.DateTimeField(default=datetime.datetime.utcnow())
 	mode_operator = models.BooleanField(default=False)
 	mode_voice = models.BooleanField(default=False)
 	user = models.ForeignKey(User)
