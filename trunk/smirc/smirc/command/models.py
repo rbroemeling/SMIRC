@@ -162,7 +162,7 @@ class SmircCommandKick(SmircCommand):
 	def execute(self, executor):
 		"""Kick a user out of a conversation that you control.
 
-		*KICK [user to kick] out of [conversation you own]
+		*KICK [user to kick] out of [conversation you are an operator of]
 		"""
 		try:
 			executor_membership = Membership.load_membership(executor, self.arguments['conversation_identifier'])
@@ -195,6 +195,7 @@ class SmircCommandNick(SmircCommand):
 
 		*NICK [new user nickname]
 		"""
+		raise SmircCommandException('the NICK command is currently disabled while possible issues with it are examined')
 		try:
 			UserProfile.load_user(self.arguments['new_username'])
 		except User.DoesNotExist:
@@ -209,4 +210,8 @@ class SmircCommandPart(SmircCommand):
 
 		*PART [conversation you are in]
 		"""
-		pass
+		try:
+			membership = Membership.load_membership(executor, self.arguments['conversation_identifier'])
+		except Membership.DoesNotExist:
+			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
+		membership.delete()
