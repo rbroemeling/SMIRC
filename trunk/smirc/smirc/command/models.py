@@ -115,7 +115,7 @@ class SmircCommandHelp(SmircCommand):
 			return SmircCommand.usage(klass)
 		else:
 			commands = []
-			for name, obj in inspect.getmembers(sys.modules[__name__])
+			for name, obj in inspect.getmembers(sys.modules[__name__]):
 				if inspect.isclass(obj) and issubclass(obj, SmircCommand):
 					name = name.replace('SmircCommand', '')
 					commands.append(name.upper())
