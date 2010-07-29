@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from smirc.chat.models import Conversation
 from smirc.chat.models import Invitation
 from smirc.chat.models import Membership
+from smirc.chat.models import RestrictedNameException
 from smirc.chat.models import UserProfile
 
 class SmircCommandException(Exception):
@@ -63,13 +64,18 @@ class SmircCommand:
 			raise SmircCommandException('bad command "%s", try %shelp' % (s, SmircCommand.COMMAND_CHARACTER))
 
 class SmircCommandCreate(SmircCommand):
-	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S{1,16})\s*$' # TODO: pull the regex for a conversation name from the Conversation object
+	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self, executor):
 		"""Create a new conversation.
 		
 		*CREATE [conversation name]
 		"""
+		try:
+			Conversation.validate_name(self.arguments['conversation_identifier'])
+		except RestrictedNameException, e:
+			raise SmircCommandException(str(e))
+
 		try:
 			Membership.load_membership(executor, self.arguments['conversation_identifier'])
 		except Membership.DoesNotExist:
@@ -87,7 +93,7 @@ class SmircCommandCreate(SmircCommand):
 			raise SmircCommandException('you are already taking part in a conversation named %s' % (self.arguments['conversation_identifier']))
 
 class SmircCommandInvite(SmircCommand):
-	ARGUMENTS_REGEX = '(?P<user>\S{1,16})\s+to\s+(?P<conversation_identifier>\S{1,16})\s*$' # TODO: pull the regex for a user name and a conversation name from the UserProfile/Conversation objects
+	ARGUMENTS_REGEX = '(?P<user>\S+)\s+to\s+(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self, executor):
 		"""Invite a user to a conversation that you are an operator of.
@@ -123,7 +129,7 @@ class SmircCommandInvite(SmircCommand):
 		# TODO: send message to user about their invitation to conversation
 
 class SmircCommandJoin(SmircCommand):
-	ARGUMENTS_REGEX = '(?P<user>\S{1,16})\s+in\s+(?P<conversation_identifier>\S{1,16})\s*$' # TODO: pull the regex for the user name and the conversation name from UserProfile/Conversation objects
+	ARGUMENTS_REGEX = '(?P<user>\S+)\s+in\s+(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self, executor):
 		"""Join a chat conversation that you've been invited to.
@@ -157,7 +163,7 @@ class SmircCommandJoin(SmircCommand):
 		# TODO: send message to user about joining ther conversation
 
 class SmircCommandKick(SmircCommand):
-	ARGUMENTS_REGEX = '(?P<user>\S{1,16})\s+out of\s+(?P<conversation_identifier>\S{1,16})\s*$' # TODO: pull the regex for the user name and the conversation name from UserProfile/Conversation objects
+	ARGUMENTS_REGEX = '(?P<user>\S+)\s+out\s+of\s+(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self, executor):
 		"""Kick a user out of a conversation that you control.
@@ -184,11 +190,10 @@ class SmircCommandKick(SmircCommand):
 			pass
 		else:
 			membership.delete()
-		
 		# TODO: send a success message to the executor about the user being removed from the conversation.
 
 class SmircCommandNick(SmircCommand):
-	ARGUMENTS_REGEX = '(?P<new_username>\S{1,16})\s*$' # TODO: pull the regex for a user name from the UserProfile object
+	ARGUMENTS_REGEX = '(?P<new_username>\S+)\s*$'
 
 	def execute(self, executor):
 		"""Change your user nickname.
@@ -196,6 +201,12 @@ class SmircCommandNick(SmircCommand):
 		*NICK [new user nickname]
 		"""
 		raise SmircCommandException('the NICK command is currently disabled while possible issues with it are examined')
+
+		try:
+			UserProfile.validate_name(self.arguments['new_username'])
+		except RestrictedNameException, e:
+			raise SmircCommandException(str(e))
+
 		try:
 			UserProfile.load_user(self.arguments['new_username'])
 		except User.DoesNotExist:

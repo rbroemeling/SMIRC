@@ -1,5 +1,13 @@
 from django.contrib.auth.models import User
 from django.db import models
+import re
+
+class RestrictedNameException(Exception):
+	def __init__(self, value):
+		self.value = value
+
+	def __str__(self):
+		return repr(self.value)
 
 class Conversation(models.Model):
 	name = models.CharField(max_length=16, db_index=True)
@@ -8,6 +16,17 @@ class Conversation(models.Model):
 
 	def __unicode__(self):
 		return self.name
+
+	@staticmethod
+	def validate_name(s):
+		s = s.lower()
+		if re.match('[A-Za-z]+[0-9A-Za-z]*', s):
+			pass
+		else:
+			raise RestrictedNameException('conversation names must start with a letter and be made up only of alphanumeric characters')
+		if s.find('smirc') != -1:
+			raise RestrictedNameException('conversation names may not contain the string "smirc"')
+		return True
 
 class Invitation(models.Model):
 	class Meta:
@@ -86,3 +105,14 @@ class UserProfile(models.Model):
 				return profile.user
 		else:
 			return User.objects.get(name=u)
+
+	@staticmethod
+	def validate_name(s):
+		s = s.lower()
+		if re.match('[A-Za-z]+[0-9A-Za-z]*', s):
+			pass
+		else:
+			raise RestrictedNameException('user nicknames must start with a letter and be made up only of alphanumeric characters')
+		if s.find('smirc') != -1:
+			raise RestrictedNameException('user nicknames may not contain the string "smirc"')
+		return True
