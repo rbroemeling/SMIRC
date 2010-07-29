@@ -102,18 +102,18 @@ class SmircCommandInvite(SmircCommand):
 			raise SmircCommandException('you are not an operator of the conversation named %s' % (membership.conversation.name))
 				
 		try:
-			Membership.load_membership(self.arguments['user'], membership.conversation.name)
+			Membership.load_membership(self.arguments['user'], membership.conversation)
 		except Membership.DoesNotExist:
 			pass
 		else:
-			raise SmircCommandException('user %s is already in a conversation named %s' % (self.arguments['user'].username, membership.conversation.name))
+			raise SmircCommandException('user %s is already a member of the conversation named %s' % (self.arguments['user'].username, membership.conversation.name))
 
 		try:
-			Invitation.objects.get(conversation=membership.conversation, invitee=self.arguments['user'])
+			Invitation.objects.get(invitee=self.arguments['user'], conversation=membership.conversation)
 		except Invitation.DoesNotExist:
 			pass
 		else:
-			raise SmircCommandException('user %s has already been invited to conversation %s' % (self.arguments['user'].username, membership.conversation.name))
+			raise SmircCommandException('user %s has already been invited to the conversation named %s' % (self.arguments['user'].username, membership.conversation.name))
 
 		i = Invitation()
 		i.invitee = self.arguments['user']
