@@ -157,14 +157,35 @@ class SmircCommandJoin(SmircCommand):
 		# TODO: send message to user about joining ther conversation
 
 class SmircCommandKick(SmircCommand):
+	ARGUMENTS_REGEX = '(?P<user>\S{1,16})\s+out of\s+(?P<conversation_identifier>\S{1,16})\s*$' # TODO: pull the regex for the user name and the conversation name from UserProfile/Conversation objects
+
 	def execute(self, executor):
 		"""Kick a user out of a conversation that you control.
 
-		*KICK [user to kick] [conversation you own]
+		*KICK [user to kick] out of [conversation you own]
 		"""
-		# TODO: intertwine this with cmd_invite, as they do basically the same thing.
-		# Maybe outsource it to a private function?
-		pass
+		try:
+			executor_membership = Membership.load_membership(executor, self.arguments['conversation_identifier'])
+		except Membership.DoesNotExist:
+			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
+		if not executor_membership.mode_operator:
+			raise SmircCommandException('you are not an operator of the conversation named %s' % (executor_membership.conversation.name))
+
+		try:
+			invitations = Invitation.objects.get(invitee=self.arguments['user'], conversation=executor_membership.conversation)
+		except Invitation.DoesNotExist:
+			pass
+		else:
+			invitations.delete()
+
+		try:
+			membership = Membership.load_membership(self.arguments['user'], executor_membership.conversation)
+		except Membership.DoesNotExist:
+			pass
+		else:
+			membership.delete()
+		
+		# TODO: send a success message to the executor about the user being removed from the conversation.
 
 class SmircCommandNick(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<new_username>\S{1,16})\s*$' # TODO: pull the regex for a user name from the UserProfile object
