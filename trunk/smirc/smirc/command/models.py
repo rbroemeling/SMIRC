@@ -155,7 +155,8 @@ class SmircCommandInvite(SmircCommand):
 		i.inviter = executor
 		i.conversation = membership.conversation
 		i.save()
-		# TODO: send message to user about their invitation to conversation
+		# TODO: send message to self.arguments['user'], alerting them that they have been invited to i.conversation
+		return 'user %s has been invited to the conversation named %s' % (self.arguments['user'].username, membership.conversation.name)
 
 class SmircCommandJoin(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+in\s+(?P<conversation_identifier>\S+)\s*$'
@@ -189,7 +190,7 @@ class SmircCommandJoin(SmircCommand):
 		m.user = executor
 		m.save()
 		invitation.delete()
-		# TODO: send message to user about joining ther conversation
+		return 'you have joined the conversation named %s' % (m.conversation.name)
 
 class SmircCommandKick(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+out\s+of\s+(?P<conversation_identifier>\S+)\s*$'
@@ -206,11 +207,13 @@ class SmircCommandKick(SmircCommand):
 		if not executor_membership.mode_operator:
 			raise SmircCommandException('you are not an operator of the conversation named %s' % (executor_membership.conversation.name))
 
+		result = None
 		try:
 			invitations = Invitation.objects.get(invitee=self.arguments['user'], conversation=executor_membership.conversation)
 		except Invitation.DoesNotExist:
 			pass
 		else:
+			result = 'user %s has had all invitations to join the conversation %s revoked' % (self.arguments['user'].username, executor_membership.conversation.name)
 			invitations.delete()
 
 		try:
@@ -218,8 +221,13 @@ class SmircCommandKick(SmircCommand):
 		except Membership.DoesNotExist:
 			pass
 		else:
+			result = 'user %s has been removed from the conversation %s' % (self.arguments['user'].username, executor_membership.conversation.name)
 			membership.delete()
-		# TODO: send a success message to the executor about the user being removed from the conversation.
+		
+		if result is not None:
+			return result
+		else:
+			return 'user %s was not a member of the conversation %s' % (self.arguments['user'].username, executor_membership.conversation.name)
 
 class SmircCommandNick(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<new_username>\S+)\s*$'
