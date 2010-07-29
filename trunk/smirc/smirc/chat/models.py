@@ -34,8 +34,8 @@ class Invitation(models.Model):
 		unique_together = (('invitee','conversation'))
 
 	conversation = models.ForeignKey(Conversation)
-	inviter = models.ForeignKey(User)
-	invitee = models.ForeignKey(User)
+	inviter = models.ForeignKey(User, related_name = 'invitations_sent')
+	invitee = models.ForeignKey(User, related_name = 'invitations_received')
 
 class Membership(models.Model):
 	class Meta:
