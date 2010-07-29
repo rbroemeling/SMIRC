@@ -4,6 +4,8 @@ from smirc.chat.models import Invitation
 from smirc.chat.models import Membership
 from smirc.chat.models import RestrictedNameException
 from smirc.chat.models import UserProfile
+import inspect
+import sys
 
 class SmircCommandException(Exception):
 	def __init__(self, value):
@@ -26,14 +28,7 @@ class SmircCommand:
 		if match:
 			self.arguments = match.groupdict()
 		else:
-			usage = ''
-			if self.execute.__doc__:
-				for line in self.execute.__doc__.splitlines():
-					line = line.trim()
-					if line[0:1] == SmircCommand.COMMAND_CHARACTER:
-						usage = line
-			assert usage != ''
-			raise SmircCommandException('invalid arguments given, try %s' % (usage))
+			raise SmircCommandException('invalid arguments given, try %s' % (SmircCommand.usage(self)))
 		if 'user' in self.arguments:
 			try:
 				u = UserProfile.load_user(self.arguments['user'])
@@ -46,22 +41,37 @@ class SmircCommand:
 		raise SmircCommandException('command %s has not yet been implemented' % (self.command))
 
 	@staticmethod
+	def fetch_command_class(klass_name):
+		try:
+			if not re.match('^[A-Za-z]+$'):
+				raise AttributeError
+			klass_name = klass_name[0:1].upper() + klass_name[1:].lower()
+			klass = getattr(smirc.command.models, "SmircCommand%s" % (klass_name))
+		except AttributeError, e:
+			raise SmircCommandException('unknown command "%s", try %shelp' % (klass_name.lower(), SmircCommand.COMMAND_CHARACTER))
+		else:
+			return klass
+
+	@staticmethod
 	def handle(s):
 		if len(s) == 0 or s[0:1] != COMMAND_CHARACTER:
 			return False
 		match = re.match('^([A-Za-z]+)\s*(.*)', s[1:])
-		if match:
-			klass_name = match.group(1)
-			klass_name = klass_name[0:1].upper() + klass_name[1:].lower()
-			arguments = match.group(2)
-			try:
-				klass = getattr(smirc.command.models, "SmircCommand%s" % (klass_name))
-			except AttributeError, e:
-				raise SmircCommandException('unknown command "%s", try %shelp' % (klass_name.lower(), SmircCommand.COMMAND_CHARACTER))
-			else:
-				return klass(klass_name.lower(), arguments)
+		if match:	
+			klass = SmircCommand.fetch_command_class(match.group(1))
+			return klass(match.group(1).lower(), match.group(2))
 		else:
 			raise SmircCommandException('bad command "%s", try %shelp' % (s, SmircCommand.COMMAND_CHARACTER))
+
+	@staticmethod
+	def usage(klass):
+		if klass.execute.__doc__:
+			for line in klass.execute.__doc__.splitlines():
+				line = line.trim()
+				if line[0:1] == SmircCommand.COMMAND_CHARACTER:
+					return line
+		# TODO: log an error that there is no usage for this command here.
+		return ''
 
 class SmircCommandCreate(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
@@ -92,6 +102,26 @@ class SmircCommandCreate(SmircCommand):
 		else:
 			raise SmircCommandException('you are already taking part in a conversation named %s' % (self.arguments['conversation_identifier']))
 
+class SmircCommandHelp(SmircCommand):
+	ARGUMENTS_REGEX = '(?P<command>\S+)?\s*$'
+	
+	def execute(self, executor):
+		"""Get help about what commands are available or what the syntax
+		for executing a command is.
+		
+		*HELP or *HELP [command]
+		"""
+		if self.arguments['command']:
+			klass = SmircCommand.fetch_command_class(self.arguments['command'])
+			return SmircCommand.usage(klass)
+		else:
+			commands = []
+			for name, obj in inspect.getmembers(sys.modules[__name__])
+				if inspect.isclass(obj) and issubclass(obj, SmircCommand):
+					name = name.replace('SmircCommand', '')
+					commands.append(name.upper())
+			return string.join(commands, ', ')
+	
 class SmircCommandInvite(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+to\s+(?P<conversation_identifier>\S+)\s*$'
 
