@@ -87,12 +87,12 @@ class SmircCommandCreate(SmircCommand):
 			raise SmircCommandException('you are already taking part in a conversation named %s' % (self.arguments['conversation_identifier']))
 
 class SmircCommandInvite(SmircCommand):
-	ARGUMENTS_REGEX = '(?P<user>\S{1,16})\s+(?P<conversation_identifier>\S{1,16})\s*$' # TODO: pull the regex for a user name and a conversation name from the UserProfile/Conversation objects
+	ARGUMENTS_REGEX = '(?P<user>\S{1,16})\s+to\s+(?P<conversation_identifier>\S{1,16})\s*$' # TODO: pull the regex for a user name and a conversation name from the UserProfile/Conversation objects
 
 	def execute(self, executor):
 		"""Invite a user to a conversation that you are an operator of.
 
-		*INVITE [user to be invited] [conversation name]
+		*INVITE [user to be invited] to [conversation name]
 		"""
 		try:
 			membership = Membership.load_membership(executor, self.arguments['conversation_identifier'])
@@ -123,12 +123,38 @@ class SmircCommandInvite(SmircCommand):
 		# TODO: send message to user about their invitation to conversation
 
 class SmircCommandJoin(SmircCommand):
+	ARGUMENTS_REGEX = '(?P<user>\S{1,16})\s+in\s+(?P<conversation_identifier>\S{1,16})\s*$' # TODO: pull the regex for the user name and the conversation name from UserProfile/Conversation objects
+
 	def execute(self, executor):
 		"""Join a chat conversation that you've been invited to.
 
-		*JOIN [conversation you are invited to]
+		*JOIN [user who invited you] in [conversation you are invited to]
 		"""
-		pass
+		try:
+			invitation = Invitation.objects.get(invitee=executor, inviter=self.arguments['user'], conversation__name__iexact=self.arguments['conversation_identifier'])
+		except Invitation.DoesNotExist:
+			raise SmircCommandException('you do not have an outstanding invitation from %s to the conversation %s' % (self.arguments['user'].username, self.arguments['conversation_identifier']))
+		
+		try:
+			Membership.load_membership(executor, invitation.conversation)
+		except Membership.DoesNotExist:
+			pass
+		else:
+			raise SmircCommandException('you are already in the conversation %s with the user %s', invitation.conversation.name, self.arguments['user'].username)
+
+		try:
+			Membership.load_membership(executor, invitation.conversation.name)
+		except Membership.DoesNotExist:
+			pass
+		else:
+			raise SmircCommandException('you are already in a conversation named %s')
+		
+		m = Membership()
+		m.conversation = invitation.conversation
+		m.user = executor
+		m.save()
+		invitation.delete()
+		# TODO: send message to user about joining ther conversation
 
 class SmircCommandKick(SmircCommand):
 	def execute(self, executor):
