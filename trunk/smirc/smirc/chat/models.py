@@ -10,7 +10,7 @@ class SmircException(Exception):
 	def __str__(self):
 		if isinstance(self.value, str):
 			return self.value
-		else
+		else:
 			return repr(self.value)
 			
 class SmircRestrictedNameException(SmircException):
