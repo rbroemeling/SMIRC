@@ -127,5 +127,5 @@ if __name__ == '__main__':
 		if smircd_terminate == True:
 			notifier.stop()
 			break
-		if notifier.check_events():
+		if notifier.check_events(timeout=500):
 			notifier.read_events()
