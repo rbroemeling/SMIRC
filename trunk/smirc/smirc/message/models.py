@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import stat
 import tempfile
 from django.db import models
 from django.conf import settings
@@ -105,6 +106,7 @@ class SMSToolsMessage(MessageSkeleton):
 	def raw_send(self, phone_number, message):
 		tempfile.tempdir = settings.SMSTOOLS['outbound_dir']
 		(fd, path) = tempfile.mkstemp('suffix', 'prefix', None, True)
+		os.fchmod(fd, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP)
 		f = os.fdopen(fd, 'w')
 		f.write('To: %s\n' % (phone_number))
 		f.write('\n')
