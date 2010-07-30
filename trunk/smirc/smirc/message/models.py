@@ -38,7 +38,7 @@ class MessageSkeleton(models.Model):
 		try:
 			user = UserProfile.load_user(self.raw_phone_number)
 		except User.DoesNotExist:
-			raise SmircMessageException('unknown sender %s -- maybe you are not registered for SMIRC (www.smirc.com)?' % (self.raw_phone_number))
+			raise SmircMessageException('unknown sender %s -- maybe you are not registered? Please visit www.smirc.com to register.' % (self.raw_phone_number))
 
 		self.command = SmircCommand.handle(self.raw_body)
 		if self.command:

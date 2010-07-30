@@ -28,8 +28,8 @@ from smirc.message.models import SMSToolsMessage
 __version__ = '$Rev$'
 
 class SMSFileHandler(pyinotify.ProcessEvent):
-	def process_IN_CLOSE_WRITE(self, event):
-		logging.debug('event IN_CLOSE_WRITE occurred for %s' % event.pathname)
+	def process_IN_MODIFY(self, event):
+		logging.debug('event IN_MODIFY occurred for %s' % event.pathname)
 		message = SMSToolsMessage()
 		response = SMSToolsMessage()
 		try:
@@ -118,7 +118,7 @@ if __name__ == '__main__':
 	watch_manager = pyinotify.WatchManager()
 	sms_file_handler = SMSFileHandler()
 	notifier = pyinotify.Notifier(watch_manager, sms_file_handler)
-	watch_manager.add_watch(settings.SMSTOOLS['inbound_dir'], pyinotify.IN_CLOSE_WRITE)
+	watch_manager.add_watch(settings.SMSTOOLS['inbound_dir'], pyinotify.IN_MODIFY)
 	
 	# TODO: deal with pre-existing files (i.e. files that have already been received and
 	# are sitting on our inbound directory right now.
