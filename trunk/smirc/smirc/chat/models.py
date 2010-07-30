@@ -13,7 +13,7 @@ class SmircException(Exception):
 		else
 			return repr(self.value)
 			
-class RestrictedNameException(SmircException):
+class SmircRestrictedNameException(SmircException):
 	pass
 
 class Conversation(models.Model):
@@ -30,9 +30,9 @@ class Conversation(models.Model):
 		if re.match('[A-Za-z]+[0-9A-Za-z]*', s):
 			pass
 		else:
-			raise RestrictedNameException('conversation names must start with a letter and be made up only of alphanumeric characters')
+			raise SmircRestrictedNameException('conversation names must start with a letter and be made up only of alphanumeric characters')
 		if s.find('smirc') != -1:
-			raise RestrictedNameException('conversation names may not contain the string "smirc"')
+			raise SmircRestrictedNameException('conversation names may not contain the string "smirc"')
 		return True
 
 class Invitation(models.Model):
@@ -119,7 +119,7 @@ class UserProfile(models.Model):
 		if re.match('[A-Za-z]+[0-9A-Za-z]*', s):
 			pass
 		else:
-			raise RestrictedNameException('user nicknames must start with a letter and be made up only of alphanumeric characters')
+			raise SmircRestrictedNameException('user nicknames must start with a letter and be made up only of alphanumeric characters')
 		if s.find('smirc') != -1:
-			raise RestrictedNameException('user nicknames may not contain the string "smirc"')
+			raise SmircRestrictedNameException('user nicknames may not contain the string "smirc"')
 		return True

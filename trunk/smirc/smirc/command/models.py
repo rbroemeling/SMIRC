@@ -2,8 +2,8 @@ from django.contrib.auth.models import User
 from smirc.chat.models import Conversation
 from smirc.chat.models import Invitation
 from smirc.chat.models import Membership
-from smirc.chat.models import RestrictedNameException
 from smirc.chat.models import SmircException
+from smirc.chat.models import SmircRestrictedNameException
 from smirc.chat.models import UserProfile
 import inspect
 import sys
@@ -80,7 +80,7 @@ class SmircCommandCreate(SmircCommand):
 		"""
 		try:
 			Conversation.validate_name(self.arguments['conversation_identifier'])
-		except RestrictedNameException as e:
+		except SmircRestrictedNameException as e:
 			raise SmircCommandException(str(e))
 
 		try:
@@ -238,7 +238,7 @@ class SmircCommandNick(SmircCommand):
 
 		try:
 			UserProfile.validate_name(self.arguments['new_username'])
-		except RestrictedNameException as e:
+		except SmircRestrictedNameException as e:
 			raise SmircCommandException(str(e))
 
 		try:
