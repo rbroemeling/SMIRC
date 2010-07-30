@@ -21,6 +21,7 @@ import signal
 import sys
 from django.conf import settings
 from smirc.command.models import SmircCommand
+from smirc.message.models import MessageException
 from smirc.message.models import SMSToolsMessage
 
 __version__ = '$Rev$'
@@ -33,7 +34,7 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 		response = SMSToolsMessage()
 		try:
 			message.receive(event.pathname)
-		except FieldError, e:
+		except MessageException, e:
 			if message.user:
 				response.body = str(e)
 				response.system = True

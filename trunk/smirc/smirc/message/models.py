@@ -3,11 +3,16 @@ import re
 import tempfile
 from django.db import models
 from django.contrib.auth.models import User
-# TODO: Create our own class of exception, rather than over-loading FieldError
-from django.core.exceptions import FieldError
 from smirc.chat.models import Conversation
 from smirc.chat.models import Membership
 from smirc.chat.models import UserProfile
+
+class MessageException(Exception):
+	def __init__(self, value):
+		self.value = value
+
+	def __str__(self):
+		return repr(self.value)
 
 class MessageSkeleton(models.Model):
 	body = None
@@ -21,13 +26,13 @@ class MessageSkeleton(models.Model):
 		try:
 			user = UserProfile.load_user(phone_number)
 		except User.DoesNotExist:
-			raise FieldError('unknown message sender: %s' % (phone_number))
+			raise MessageException('unknown message sender: %s' % (phone_number))
 
 		if body is None:
-			raise FieldError('null message body')
+			raise MessageException('null message body')
 		body = body.strip()
 		if body == '':
-			raise FieldError('empty message body')
+			raise MessageException('empty message body')
 
 		self.command = SmircCommand.handle(body)
 		if self.command:
@@ -40,12 +45,12 @@ class MessageSkeleton(models.Model):
 			try:
 				self.sender = Membership.load_membership(user, conversation_identifier)
 			except Membership.DoesNotExist:
-				raise FieldError('you are not involved in a conversation named %s' % (conversation_identifier))
+				raise MessageException('you are not involved in a conversation named %s' % (conversation_identifier))
 		else:
 			try:
 				self.sender = Membership.objects.filter(user__id__exact=user.id).order_by('last_active').reverse()[0]
 			except IndexError:
-				raise FieldError('no target conversation defined and no default conversation found')
+				raise MessageException('no target conversation defined and no default conversation found')
 
 		self.body = body
 		# TODO: remember to update self.sender.last_active timestamp
@@ -53,14 +58,14 @@ class MessageSkeleton(models.Model):
 
 	def send(self, phone_number):
 		if self.body is None:
-			raise FieldError('null message body')
+			raise MessageException('null message body')
 		if self.system:
 			message = 'SMIRC: %s' % (self.body)		
 		else:
 			if self.conversation is None:
-				raise FieldError('null message conversation')
+				raise MessageException('null message conversation')
 			if self.user is None:
-				raise FieldError('null message sender')
+				raise MessageException('null message sender')
 			message = '%s@%s: %s' % (self.user.username, self.conversation.name, self.body)
 		message = message[:140]
 		return self.raw_send(phone_number, message)
@@ -133,27 +138,27 @@ This is the Text that I have sent with my mobile phone to the computer.""")
 	def test_receive_empty(self):
 		self.assertEqual(self.msg.raw_receive('/tmp/empty.message'), (None, None))
 		try:
-			self.assertRaises(FieldError, self.msg.receive('/tmp/empty.message'))
-		except FieldError:
+			self.assertRaises(MessageException, self.msg.receive('/tmp/empty.message'))
+		except MessageException:
 			pass
 
 	def test_receive_nonexistent(self):
 		self.assertEqual(self.msg.raw_receive('/tmp/nonexistent.message'), (None, None))
 		try:
-			self.assertRaises(FieldError, self.msg.receive('/tmp/nonexistent.message'))
-		except FieldError:
+			self.assertRaises(MessageException, self.msg.receive('/tmp/nonexistent.message'))
+		except MessageException:
 			pass
 
 	def test_receive_permissionerror(self):
 		self.assertEqual(self.msg.raw_receive('/tmp/permissionerror.message'), (None, None))
 		try:
-			self.assertRaises(FieldError, self.msg.receive('/tmp/permissionerror.message'))
-		except FieldError:
+			self.assertRaises(MessageException, self.msg.receive('/tmp/permissionerror.message'))
+		except MessageException:
 			pass
 
 	def test_receive_unknownuser(self):
 		self.assertEqual(self.msg.raw_receive('/tmp/unknownuser.message'), ('491721234567', 'This is the Text that I have sent with my mobile phone to the computer.'))
 		try:
-			self.assertRaises(FieldError, self.msg.receive('/tmp/unknownuser.message'))
-		except FieldError:
+			self.assertRaises(MessageException, self.msg.receive('/tmp/unknownuser.message'))
+		except MessageException:
 			pass
