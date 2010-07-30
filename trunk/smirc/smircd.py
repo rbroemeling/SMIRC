@@ -21,8 +21,8 @@ import signal
 import sys
 from django.conf import settings
 from smirc.command.models import SmircCommand
-from smirc.message.models import MessageException
-from smirc.message.models import RawMessageException
+from smirc.message.models import SmircMessageException
+from smirc.message.models import SmircRawMessageException
 from smirc.message.models import SMSToolsMessage
 
 __version__ = '$Rev$'
@@ -34,9 +34,9 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 		response = SMSToolsMessage()
 		try:
 			message.receive(event.pathname)
-		except RawMessageException as e:
+		except SmircRawMessageException as e:
 			logging.error('raw message exception occurred while receiving messages %s: %s' % (event.pathname, e))
-		except MessageException as e:
+		except SmircMessageException as e:
 			response.body = str(e)
 			response.system = True
 		except Exception as e:

@@ -11,10 +11,10 @@ from smirc.chat.models import Membership
 from smirc.chat.models import SmircException
 from smirc.chat.models import UserProfile
 
-class MessageException(SmircException):
+class SmircMessageException(SmircException):
 	pass
 
-class RawMessageException(MessageException):
+class SmircRawMessageException(SmircMessageException):
 	pass
 
 class MessageSkeleton(models.Model):
@@ -30,15 +30,15 @@ class MessageSkeleton(models.Model):
 		logging.debug('received message "%s" from %s' % (self.raw_body, self.raw_phone_number))
 
 		if self.raw_body is None:
-			raise MessageException('null message body')
+			raise SmircMessageException('null message body')
 		self.raw_body = self.raw_body.strip()
 		if self.raw_body == '':
-			raise MessageException('empty message body')
+			raise SmircMessageException('empty message body')
 
 		try:
 			user = UserProfile.load_user(self.raw_phone_number)
 		except User.DoesNotExist:
-			raise MessageException('unknown message sender: %s' % (self.raw_phone_number))
+			raise SmircMessageException('unknown message sender: %s' % (self.raw_phone_number))
 
 		self.command = SmircCommand.handle(self.raw_body)
 		if self.command:
@@ -51,26 +51,26 @@ class MessageSkeleton(models.Model):
 			try:
 				self.sender = Membership.load_membership(user, conversation_identifier)
 			except Membership.DoesNotExist:
-				raise MessageException('you are not involved in a conversation named %s' % (conversation_identifier))
+				raise SmircMessageException('you are not involved in a conversation named %s' % (conversation_identifier))
 		else:
 			try:
 				self.sender = Membership.objects.filter(user__id__exact=user.id).order_by('last_active').reverse()[0]
 			except IndexError:
-				raise MessageException('no target conversation defined and no default conversation found')
+				raise SmircMessageException('no target conversation defined and no default conversation found')
 
 		# TODO: remember to update self.sender.last_active timestamp
 		return self
 
 	def send(self, phone_number):
 		if self.body is None:
-			raise MessageException('null message body')
+			raise SmircMessageException('null message body')
 		if self.system:
 			message = 'SMIRC: %s' % (self.body)		
 		else:
 			if self.conversation is None:
-				raise MessageException('null message conversation')
+				raise SmircMessageException('null message conversation')
 			if self.user is None:
-				raise MessageException('null message sender')
+				raise SmircMessageException('null message sender')
 			message = '%s@%s: %s' % (self.user.username, self.conversation.name, self.body)
 		message = message[:140]
 		return self.raw_send(phone_number, message)
@@ -98,7 +98,7 @@ class SMSToolsMessage(MessageSkeleton):
 		if headers.has_key('from'):
 			self.raw_phone_number = headers['from']
 		else:
-			raise RawMessageException('no "from" header was found in the file %s' % (location))
+			raise SmircRawMessageException('no "from" header was found in the file %s' % (location))
 
 	def raw_send(self, phone_number, message):
 		tempfile.tempdir = settings.SMSTOOLS['outbound_dir']
@@ -140,27 +140,27 @@ class SMSToolsMessage(MessageSkeleton):
 	# def test_receive_empty(self):
 		# self.assertEqual(self.msg.raw_receive('/tmp/empty.message'), (None, None))
 		# try:
-			# self.assertRaises(MessageException, self.msg.receive('/tmp/empty.message'))
-		# except MessageException:
+			# self.assertRaises(SmircMessageException, self.msg.receive('/tmp/empty.message'))
+		# except SmircMessageException:
 			# pass
 # 
 	# def test_receive_nonexistent(self):
 		# self.assertEqual(self.msg.raw_receive('/tmp/nonexistent.message'), (None, None))
 		# try:
-			# self.assertRaises(MessageException, self.msg.receive('/tmp/nonexistent.message'))
-		# except MessageException:
+			# self.assertRaises(SmircMessageException, self.msg.receive('/tmp/nonexistent.message'))
+		# except SmircMessageException:
 			# pass
 # 
 	# def test_receive_permissionerror(self):
 		# self.assertEqual(self.msg.raw_receive('/tmp/permissionerror.message'), (None, None))
 		# try:
-			# self.assertRaises(MessageException, self.msg.receive('/tmp/permissionerror.message'))
-		# except MessageException:
+			# self.assertRaises(SmircMessageException, self.msg.receive('/tmp/permissionerror.message'))
+		# except SmircMessageException:
 			# pass
 # 
 	# def test_receive_unknownuser(self):
 		# self.assertEqual(self.msg.raw_receive('/tmp/unknownuser.message'), ('491721234567', 'This is the Text that I have sent with my mobile phone to the computer.'))
 		# try:
-			# self.assertRaises(MessageException, self.msg.receive('/tmp/unknownuser.message'))
-		# except MessageException:
+			# self.assertRaises(SmircMessageException, self.msg.receive('/tmp/unknownuser.message'))
+		# except SmircMessageException:
 			# pass
