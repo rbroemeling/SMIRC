@@ -47,7 +47,7 @@ class SmircCommand:
 				raise AttributeError
 			klass_name = klass_name[0:1].upper() + klass_name[1:].lower()
 			klass = getattr(smirc.command.models, "SmircCommand%s" % (klass_name))
-		except AttributeError, e:
+		except AttributeError as e:
 			raise SmircCommandException('unknown command "%s", try %shelp' % (klass_name.lower(), SmircCommand.COMMAND_CHARACTER))
 		else:
 			return klass
@@ -83,7 +83,7 @@ class SmircCommandCreate(SmircCommand):
 		"""
 		try:
 			Conversation.validate_name(self.arguments['conversation_identifier'])
-		except RestrictedNameException, e:
+		except RestrictedNameException as e:
 			raise SmircCommandException(str(e))
 
 		try:
@@ -241,7 +241,7 @@ class SmircCommandNick(SmircCommand):
 
 		try:
 			UserProfile.validate_name(self.arguments['new_username'])
-		except RestrictedNameException, e:
+		except RestrictedNameException as e:
 			raise SmircCommandException(str(e))
 
 		try:
