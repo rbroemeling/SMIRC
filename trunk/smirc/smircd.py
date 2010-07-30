@@ -53,7 +53,10 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 				pass
 				# TODO: deal with the message in message.body, sent by message.user to message.conversation
 		if response.body:
-			response.send(message.raw_phone_number)
+			try:
+				response.send(message.raw_phone_number)
+			except Exception as e:
+				logging.error('unhandled exception occurred while sending message to %s: %s' % (message.raw_phone_number, e))
 
 def signal_handler(signum, frame):
 	global smircd_terminate
