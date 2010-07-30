@@ -67,7 +67,8 @@ function shutil_tarball_source_install
 	local STOW_DIR="/usr/local/stow/${PACKAGE_NAME}"
 	mkdir -p "${STOW_DIR}"
 	chown -R nobody "${STOW_DIR}"
-	cd "/tmp/${PACKAGE_NAME}"
+	cd "/tmp/${PACKAGE_NAME}" || true # ignore an error changing into our package directory, if one occurs
+	                                  # this works around packages that don't extract into the standard directory
 
 	if [ -t 0 ]; then
 		# stdin is a terminal -- i.e. no custom configure/make/make install
