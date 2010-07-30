@@ -3,16 +3,13 @@ from smirc.chat.models import Conversation
 from smirc.chat.models import Invitation
 from smirc.chat.models import Membership
 from smirc.chat.models import RestrictedNameException
+from smirc.chat.models import SmircException
 from smirc.chat.models import UserProfile
 import inspect
 import sys
 
-class SmircCommandException(Exception):
-	def __init__(self, value):
-		self.value = value
-
-	def __str__(self):
-		return repr(self.value)
+class SmircCommandException(SmircException):
+	pass
 
 class SmircCommand:
 	ARGUMENTS_REGEX = None

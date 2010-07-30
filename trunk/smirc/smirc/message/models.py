@@ -8,14 +8,14 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from smirc.chat.models import Conversation
 from smirc.chat.models import Membership
+from smirc.chat.models import SmircException
 from smirc.chat.models import UserProfile
 
-class MessageException(Exception):
-	def __init__(self, value):
-		self.value = value
+class MessageException(SmircException):
+	pass
 
-	def __str__(self):
-		return repr(self.value)
+class RawMessageException(MessageException):
+	pass
 
 class MessageSkeleton(models.Model):
 	body = None
@@ -74,9 +74,6 @@ class MessageSkeleton(models.Model):
 			message = '%s@%s: %s' % (self.user.username, self.conversation.name, self.body)
 		message = message[:140]
 		return self.raw_send(phone_number, message)
-
-class RawMessageException(MessageException):
-	pass
 
 class SMSToolsMessage(MessageSkeleton):
 	def raw_receive(self, location):

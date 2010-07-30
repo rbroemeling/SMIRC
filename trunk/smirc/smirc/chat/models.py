@@ -3,12 +3,18 @@ from django.db import models
 import datetime
 import re
 
-class RestrictedNameException(Exception):
+class SmircException(Exception):
 	def __init__(self, value):
 		self.value = value
 
 	def __str__(self):
-		return repr(self.value)
+		if isinstance(self.value, str):
+			return self.value
+		else
+			return repr(self.value)
+			
+class RestrictedNameException(SmircException):
+	pass
 
 class Conversation(models.Model):
 	name = models.CharField(max_length=16, db_index=True)
