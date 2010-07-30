@@ -73,6 +73,7 @@ class MessageSkeleton(models.Model):
 				raise SmircMessageException('null message sender')
 			message = '%s@%s: %s' % (self.user.username, self.conversation.name, self.body)
 		message = message[:140]
+		logging.debug('sending message "%s" to %s' % (message, phone_number))
 		return self.raw_send(phone_number, message)
 
 class SMSToolsMessage(MessageSkeleton):
