@@ -22,6 +22,7 @@ class MessageSkeleton(models.Model):
 
 	def receive(self, data):
 		(phone_number, body) = self.raw_receive(data)
+		logging.debug('received message "%s" from %s' % (body, phone_number))
 
 		try:
 			user = UserProfile.load_user(phone_number)
