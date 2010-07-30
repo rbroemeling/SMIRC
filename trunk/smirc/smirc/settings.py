@@ -84,8 +84,8 @@ SITE_ID = 1
 
 # Configuration for smstools sms inbound/outbound directories.
 SMSTOOLS = {
-	'inbound_dir': '/tmp/inbound',
-	'outbound_dir': '/tmp/outbound'
+	'inbound_dir': '/var/spool/sms/incoming',
+	'outbound_dir': '/var/spool/sms/outgoing'
 }
 
 TEMPLATE_DEBUG = DEBUG

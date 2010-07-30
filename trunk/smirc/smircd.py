@@ -50,9 +50,10 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 					response.body = str(e)
 				response.system = True
 			else:
+				pass
 				# TODO: deal with the message in message.body, sent by message.user to message.conversation
 		if receive_exception:
-			logging.warning('unhandled exception occurred while receiving message %s: %s' % (event.pathname, str(receive_exception))
+			logging.warning('unhandled exception occurred while receiving message %s: %s' % (event.pathname, str(receive_exception)))
 		if response.body:
 			response.send(message.user.profile.phone_number)			
 
