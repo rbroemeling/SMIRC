@@ -28,7 +28,7 @@ class Conversation(models.Model):
 	@staticmethod
 	def validate_name(s):
 		s = s.lower()
-		if re.match('[A-Za-z]+[0-9A-Za-z]*', s):
+		if re.match('^[A-Za-z]+[0-9A-Za-z]*$', s):
 			pass
 		else:
 			raise SmircRestrictedNameException('conversation names must start with a letter and be made up only of alphanumeric characters')
@@ -117,7 +117,7 @@ class UserProfile(models.Model):
 	@staticmethod
 	def validate_name(s):
 		s = s.lower()
-		if re.match('[A-Za-z]+[0-9A-Za-z]*', s):
+		if re.match('^[A-Za-z]+[0-9A-Za-z]*$', s):
 			pass
 		else:
 			raise SmircRestrictedNameException('user nicknames must start with a letter and be made up only of alphanumeric characters')
