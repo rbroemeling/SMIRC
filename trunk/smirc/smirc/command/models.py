@@ -127,7 +127,7 @@ class SmircCommandHelp(SmircCommand):
 					name = name.replace('SmircCommand', '')
 					if name:
 						commands.append(name.upper())
-			return string.join(commands, ', ')
+			return 'Commands: %s. Use /HELP [command]' % (string.join(commands, ', '))
 	
 class SmircCommandInvite(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+to\s+(?P<conversation_identifier>\S+)\s*$'
