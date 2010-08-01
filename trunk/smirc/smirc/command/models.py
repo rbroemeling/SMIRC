@@ -74,7 +74,7 @@ class SmircCommand:
 	def usage(klass):
 		if klass.execute.__doc__:
 			for line in klass.execute.__doc__.splitlines():
-				line = line.trim()
+				line = line.strip()
 				if line[0:1] == SmircCommand.COMMAND_CHARACTER:
 					return line
 		logging.error('no usage information defined for %s' % (repr(klass)))
