@@ -39,8 +39,8 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 		except (SmircCommandException, SmircMessageException) as e:
 			response.body = str(e)
 			response.system = True
-		#except Exception as e:
-		#	logging.error('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
+		except Exception as e:
+			logging.exception('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
 		else:
 			if (message.command):
 				try:
