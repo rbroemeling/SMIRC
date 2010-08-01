@@ -1,0 +1,258 @@
+[
+	{
+		"model": "message.AreaCode",
+		"pk": 204,
+		"fields": {
+			"region": "Manitoba",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 226,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 249,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 250,
+		"fields": {
+			"region": "British Columbia",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 289,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 306,
+		"fields": {
+			"region": "Saskatchewan",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 343,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 365,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 403,
+		"fields": {
+			"region": "Alberta",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 416,
+		"fields": {
+			"region": "Toronto, Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 418,
+		"fields": {
+			"region": "Quebec",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 438,
+		"fields": {
+			"region": "Montreal, Quebec",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 450,
+		"fields": {
+			"region": "Quebec",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 506,
+		"fields": {
+			"region": "New Brunswick",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 514,
+		"fields": {
+			"region": "Montreal, Quebec",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 519,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 579,
+		"fields": {
+			"region": "Quebec",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 581,
+		"fields": {
+			"region": "Quebec",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 587,
+		"fields": {
+			"region": "Alberta",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 604,
+		"fields": {
+			"region": "British Columbia",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 613,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 647,
+		"fields": {
+			"region": "Toronto, Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 705,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 709,
+		"fields": {
+			"region": "Newfoundland",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 778,
+		"fields": {
+			"region": "British Columbia",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 780,
+		"fields": {
+			"region": "Alberta",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 807,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 819,
+		"fields": {
+			"region": "Quebec",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 867,
+		"fields": {
+			"region": "Northwest Territories",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 873,
+		"fields": {
+			"region": "Quebec",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 902,
+		"fields": {
+			"region": "Nova Scotia",
+			"country": "CA"
+		}
+	},
+	{
+		"model": "message.AreaCode",
+		"pk": 905,
+		"fields": {
+			"region": "Ontario",
+			"country": "CA"
+		}
+	}
+]

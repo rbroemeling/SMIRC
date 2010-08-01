@@ -18,6 +18,15 @@ class SmircMessageException(SmircException):
 class SmircRawMessageException(SmircMessageException):
 	pass
 
+class AreaCode(models.Model):
+	COUNTRY_CHOICES = (
+		('CA', 'Canada'),
+		('USA', 'United States of America')
+	)
+	area_code = models.PositiveSmallIntegerField(primary_key=True) 
+	region = models.CharField(max_length=32)
+	country = models.CharField(max_length=32, choices=COUNTRY_CHOICES)
+
 class MessageSkeleton(models.Model):
 	body = None
 	command = False
