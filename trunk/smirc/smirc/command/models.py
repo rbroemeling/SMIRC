@@ -16,7 +16,7 @@ class SmircCommandException(SmircException):
 class SmircCommand:
 	ANONYMOUSLY_EXECUTABLE = False
 	ARGUMENTS_REGEX = None
-	COMMAND_CHARACTER = '*'
+	COMMAND_CHARACTER = '/'
 	arguments = None
 	command = None
 	executor = None
@@ -85,7 +85,7 @@ class SmircCommandCreate(SmircCommand):
 	def execute(self):
 		"""Create a new conversation.
 		
-		*CREATE [conversation name]
+		/CREATE [conversation name]
 		"""
 		try:
 			Conversation.validate_name(self.arguments['conversation_identifier'])
@@ -114,7 +114,7 @@ class SmircCommandHelp(SmircCommand):
 		"""Get help about what commands are available or what the syntax
 		for executing a command is.
 		
-		*HELP or *HELP [command]
+		/HELP or /HELP [command]
 		"""
 		if self.arguments['command']:
 			klass = SmircCommand.fetch_command_class(self.arguments['command'])
@@ -133,7 +133,7 @@ class SmircCommandInvite(SmircCommand):
 	def execute(self):
 		"""Invite a user to a conversation that you are an operator of.
 
-		*INVITE [user to be invited] to [conversation name]
+		/INVITE [user to be invited] to [conversation name]
 		"""
 		try:
 			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
@@ -170,7 +170,7 @@ class SmircCommandJoin(SmircCommand):
 	def execute(self):
 		"""Join a chat conversation that you've been invited to.
 
-		*JOIN [user who invited you] in [conversation you are invited to]
+		/JOIN [user who invited you] in [conversation you are invited to]
 		"""
 		try:
 			invitation = Invitation.objects.get(invitee=self.executor, inviter=self.arguments['user'], conversation__name__iexact=self.arguments['conversation_identifier'])
@@ -204,7 +204,7 @@ class SmircCommandKick(SmircCommand):
 	def execute(self):
 		"""Kick a user out of a conversation that you control.
 
-		*KICK [user to kick] out of [conversation you are an operator of]
+		/KICK [user to kick] out of [conversation you are an operator of]
 		"""
 		try:
 			executor_membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
@@ -242,7 +242,7 @@ class SmircCommandNick(SmircCommand):
 	def execute(self):
 		"""Change your user nickname.
 
-		*NICK [new user nickname]
+		/NICK [new user nickname]
 		"""
 		try:
 			UserProfile.validate_name(self.arguments['new_username'])
@@ -274,7 +274,7 @@ class SmircCommandPart(SmircCommand):
 	def execute(self):
 		"""Leave a chat conversation that you're currently in.
 
-		*PART [conversation you are in]
+		/PART [conversation you are in]
 		"""
 		try:
 			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
