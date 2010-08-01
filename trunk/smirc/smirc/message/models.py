@@ -37,14 +37,14 @@ class AreaCode(models.Model):
 			country_code = s[0]
 			area_code = s[1:4]
 		except IndexError:
-			logging.debug('invalid phone number failed validation: %s' % (s))
+			logging.warning('invalid phone number failed validation: %s' % (s))
 			pass
 		else:
 			try:
 				AreaCode.objects.get(area_code__exact=area_code, country_code__exact=country_code)
 				return True
 			except AreaCode.DoesNotExist:
-				logging.debug('phone number %s failed validation due to unknown country code (%s) or area code (%s)' % (s, country_code, area_code))
+				logging.warning('phone number %s failed validation due to unknown country code (%s) or area code (%s)' % (s, country_code, area_code))
 				pass
 		return False
 
