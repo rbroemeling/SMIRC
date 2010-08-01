@@ -10,6 +10,7 @@ from smirc.chat.models import Conversation
 from smirc.chat.models import Membership
 from smirc.chat.models import SmircException
 from smirc.chat.models import UserProfile
+from smirc.command.models import SmircCommand
 
 class SmircMessageException(SmircException):
 	pass
@@ -37,12 +38,15 @@ class MessageSkeleton(models.Model):
 
 		try:
 			user = UserProfile.load_user(self.raw_phone_number)
+			self.command = SmircCommand.handle(user, self.raw_body)
 		except User.DoesNotExist:
-			raise SmircMessageException('unknown sender %s -- maybe you are not registered? Please visit www.smirc.com to register.' % (self.raw_phone_number))
+			user = None
+			self.command = SmircCommand.handle(self.raw_phone_number, self.raw_body)
 
-		self.command = SmircCommand.handle(self.raw_body)
 		if self.command:
 			return
+		if user is None:
+			raise SmircMessageException('unknown sender %s -- maybe you are not registered? Please visit www.smirc.com to register.' % (self.raw_phone_number))
 
 		conversation_match = re.match('^@(\S*)\s*(.*)', self.raw_body)
 		if conversation_match:
@@ -57,9 +61,7 @@ class MessageSkeleton(models.Model):
 				self.sender = Membership.objects.filter(user__id__exact=user.id).order_by('last_active').reverse()[0]
 			except IndexError:
 				raise SmircMessageException('no target conversation defined and no default conversation found')
-
 		# TODO: remember to update self.sender.last_active timestamp
-		return self
 
 	def send(self, phone_number):
 		if self.body is None:

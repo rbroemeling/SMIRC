@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models.signals import post_save
 import datetime
 import re
 
@@ -111,7 +112,7 @@ class UserProfile(models.Model):
 			else:
 				return profile.user
 		else:
-			return User.objects.get(name=u)
+			return User.objects.get(username=u)
 
 	@staticmethod
 	def validate_name(s):

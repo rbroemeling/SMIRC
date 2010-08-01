@@ -6,16 +6,20 @@ from smirc.chat.models import SmircException
 from smirc.chat.models import SmircRestrictedNameException
 from smirc.chat.models import UserProfile
 import inspect
+import logging
+import re
 import sys
 
 class SmircCommandException(SmircException):
 	pass
 
 class SmircCommand:
+	ANONYMOUSLY_EXECUTABLE = False
 	ARGUMENTS_REGEX = None
 	COMMAND_CHARACTER = '*'
 	arguments = None
 	command = None
+	executor = None
 
 	def __init__(self, command, arguments):
 		self.command = command
@@ -34,29 +38,34 @@ class SmircCommand:
 			else:
 				self.arguments['user'] = u
 
-	def execute(self, executor):
+	def execute(self):
 		raise SmircCommandException('command %s has not yet been implemented' % (self.command))
 
 	@staticmethod
 	def fetch_command_class(klass_name):
 		try:
-			if not re.match('^[A-Za-z]+$'):
+			if not re.match('^[A-Za-z]+$', klass_name):
 				raise AttributeError
 			klass_name = klass_name[0:1].upper() + klass_name[1:].lower()
-			klass = getattr(smirc.command.models, "SmircCommand%s" % (klass_name))
+			klass = getattr(sys.modules[__name__], "SmircCommand%s" % (klass_name))
 		except AttributeError as e:
 			raise SmircCommandException('unknown command "%s", try %shelp' % (klass_name.lower(), SmircCommand.COMMAND_CHARACTER))
 		else:
 			return klass
 
 	@staticmethod
-	def handle(s):
-		if len(s) == 0 or s[0:1] != COMMAND_CHARACTER:
+	def handle(u, s):
+		if len(s) == 0 or s[0:1] != SmircCommand.COMMAND_CHARACTER:
 			return False
 		match = re.match('^([A-Za-z]+)\s*(.*)', s[1:])
-		if match:	
+		if match:
 			klass = SmircCommand.fetch_command_class(match.group(1))
-			return klass(match.group(1).lower(), match.group(2))
+			cmd = klass(match.group(1).lower(), match.group(2))
+			if isinstance(u, User) or cmd.ANONYMOUSLY_EXECUTABLE:
+				cmd.executor = u
+				return cmd
+			else:
+				return False
 		else:
 			raise SmircCommandException('bad command "%s", try %shelp' % (s, SmircCommand.COMMAND_CHARACTER))
 
@@ -67,13 +76,13 @@ class SmircCommand:
 				line = line.trim()
 				if line[0:1] == SmircCommand.COMMAND_CHARACTER:
 					return line
-		# TODO: log an error that there is no usage for this command here.
+		logging.error('no usage information defined for %s' % (repr(klass)))
 		return ''
 
 class SmircCommandCreate(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
 
-	def execute(self, executor):
+	def execute(self):
 		"""Create a new conversation.
 		
 		*CREATE [conversation name]
@@ -84,7 +93,7 @@ class SmircCommandCreate(SmircCommand):
 			raise SmircCommandException(str(e))
 
 		try:
-			Membership.load_membership(executor, self.arguments['conversation_identifier'])
+			Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
 		except Membership.DoesNotExist:
 			c = Conversation()
 			c.name = self.arguments['conversation_identifier']
@@ -92,7 +101,7 @@ class SmircCommandCreate(SmircCommand):
 			m = Membership()
 			m.conversation = c
 			m.mode_operator = True
-			m.user = executor
+			m.user = self.executor
 			m.save()
 			return 'you have created a conversation named %s' % (c.name)
 		else:
@@ -101,7 +110,7 @@ class SmircCommandCreate(SmircCommand):
 class SmircCommandHelp(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<command>\S+)?\s*$'
 	
-	def execute(self, executor):
+	def execute(self):
 		"""Get help about what commands are available or what the syntax
 		for executing a command is.
 		
@@ -121,13 +130,13 @@ class SmircCommandHelp(SmircCommand):
 class SmircCommandInvite(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+to\s+(?P<conversation_identifier>\S+)\s*$'
 
-	def execute(self, executor):
+	def execute(self):
 		"""Invite a user to a conversation that you are an operator of.
 
 		*INVITE [user to be invited] to [conversation name]
 		"""
 		try:
-			membership = Membership.load_membership(executor, self.arguments['conversation_identifier'])
+			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
 		except Membership.DoesNotExist:
 			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
 		if not membership.mode_operator:
@@ -149,7 +158,7 @@ class SmircCommandInvite(SmircCommand):
 
 		i = Invitation()
 		i.invitee = self.arguments['user']
-		i.inviter = executor
+		i.inviter = self.executor
 		i.conversation = membership.conversation
 		i.save()
 		# TODO: send message to self.arguments['user'], alerting them that they have been invited to i.conversation
@@ -158,25 +167,25 @@ class SmircCommandInvite(SmircCommand):
 class SmircCommandJoin(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+in\s+(?P<conversation_identifier>\S+)\s*$'
 
-	def execute(self, executor):
+	def execute(self):
 		"""Join a chat conversation that you've been invited to.
 
 		*JOIN [user who invited you] in [conversation you are invited to]
 		"""
 		try:
-			invitation = Invitation.objects.get(invitee=executor, inviter=self.arguments['user'], conversation__name__iexact=self.arguments['conversation_identifier'])
+			invitation = Invitation.objects.get(invitee=self.executor, inviter=self.arguments['user'], conversation__name__iexact=self.arguments['conversation_identifier'])
 		except Invitation.DoesNotExist:
 			raise SmircCommandException('you do not have an outstanding invitation from %s to the conversation %s' % (self.arguments['user'].username, self.arguments['conversation_identifier']))
 		
 		try:
-			Membership.load_membership(executor, invitation.conversation)
+			Membership.load_membership(self.executor, invitation.conversation)
 		except Membership.DoesNotExist:
 			pass
 		else:
 			raise SmircCommandException('you are already in the conversation %s with the user %s', invitation.conversation.name, self.arguments['user'].username)
 
 		try:
-			Membership.load_membership(executor, invitation.conversation.name)
+			Membership.load_membership(self.executor, invitation.conversation.name)
 		except Membership.DoesNotExist:
 			pass
 		else:
@@ -184,7 +193,7 @@ class SmircCommandJoin(SmircCommand):
 		
 		m = Membership()
 		m.conversation = invitation.conversation
-		m.user = executor
+		m.user = self.executor
 		m.save()
 		invitation.delete()
 		return 'you have joined the conversation named %s' % (m.conversation.name)
@@ -192,13 +201,13 @@ class SmircCommandJoin(SmircCommand):
 class SmircCommandKick(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+out\s+of\s+(?P<conversation_identifier>\S+)\s*$'
 
-	def execute(self, executor):
+	def execute(self):
 		"""Kick a user out of a conversation that you control.
 
 		*KICK [user to kick] out of [conversation you are an operator of]
 		"""
 		try:
-			executor_membership = Membership.load_membership(executor, self.arguments['conversation_identifier'])
+			executor_membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
 		except Membership.DoesNotExist:
 			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
 		if not executor_membership.mode_operator:
@@ -227,15 +236,14 @@ class SmircCommandKick(SmircCommand):
 			return 'user %s was not a member of the conversation %s' % (self.arguments['user'].username, executor_membership.conversation.name)
 
 class SmircCommandNick(SmircCommand):
+	ANONYMOUSLY_EXECUTABLE = True
 	ARGUMENTS_REGEX = '(?P<new_username>\S+)\s*$'
 
-	def execute(self, executor):
+	def execute(self):
 		"""Change your user nickname.
 
 		*NICK [new user nickname]
 		"""
-		raise SmircCommandException('the NICK command is currently disabled while possible issues with it are examined')
-
 		try:
 			UserProfile.validate_name(self.arguments['new_username'])
 		except SmircRestrictedNameException as e:
@@ -244,19 +252,32 @@ class SmircCommandNick(SmircCommand):
 		try:
 			UserProfile.load_user(self.arguments['new_username'])
 		except User.DoesNotExist:
-			executor.username = self.arguments['new_username']
-			executor.save()
+			if isinstance(self.executor, User):
+				self.executor.username = self.arguments['new_username']
+				self.executor.save()
+				return 'your nickname has been changed to %s' % (self.executor.username)
+			else:
+				u = User.objects.create_user(self.arguments['new_username'], '')
+				p = UserProfile()
+				p.phone_number = self.executor	
+				p.user = u
+				p.save()
+				self.executor = u
+				return 'welcome to SMIRC, %s' % (self.executor.username)
+
 		else:
 			raise SmircCommandException('the nickname %s is already in use' % (self.arguments['new_username']))
 
 class SmircCommandPart(SmircCommand):
-	def execute(self, executor):
+	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
+
+	def execute(self):
 		"""Leave a chat conversation that you're currently in.
 
 		*PART [conversation you are in]
 		"""
 		try:
-			membership = Membership.load_membership(executor, self.arguments['conversation_identifier'])
+			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
 		except Membership.DoesNotExist:
 			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
 		membership.delete()

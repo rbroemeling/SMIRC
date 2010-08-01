@@ -20,7 +20,7 @@ import pyinotify
 import signal
 import sys
 from django.conf import settings
-from smirc.command.models import SmircCommand
+from smirc.command.models import SmircCommandException
 from smirc.message.models import SmircMessageException
 from smirc.message.models import SmircRawMessageException
 from smirc.message.models import SMSToolsMessage
@@ -36,22 +36,21 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 			message.receive(event.pathname)
 		except SmircRawMessageException as e:
 			logging.error('raw message exception occurred while receiving messages %s: %s' % (event.pathname, e))
-		except SmircMessageException as e:
+		except (SmircCommandException, SmircMessageException) as e:
 			response.body = str(e)
 			response.system = True
-		except Exception as e:
-			logging.error('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
+		#except Exception as e:
+		#	logging.error('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
 		else:
 			if (message.command):
-				command = SmircCommand()
 				try:
-					response.body = command.execute(message)
+					response.body = message.command.execute()
 				except SmircCommandException as e:
-					response.body = str(e)
+					response.boxy = str(e)
 				response.system = True
 			else:
-				pass
-				# TODO: deal with the message in message.body, sent by message.user to message.conversation
+				# TODO: deal with the message in message.body, sent by message.sender to message.conversation
+				pass		
 		if response.body:
 			try:
 				response.send(message.raw_phone_number)
