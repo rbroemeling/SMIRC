@@ -8,6 +8,7 @@ from smirc.chat.models import UserProfile
 import inspect
 import logging
 import re
+import string
 import sys
 
 class SmircCommandException(SmircException):
