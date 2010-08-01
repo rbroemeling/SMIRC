@@ -22,6 +22,7 @@ import sys
 from django.conf import settings
 from smirc.command.models import SmircCommandException
 from smirc.message.models import SmircMessageException
+from smirc.message.models import SmircOutOfAreaException
 from smirc.message.models import SmircRawMessageException
 from smirc.message.models import SMSToolsMessage
 
@@ -34,11 +35,13 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 		response = SMSToolsMessage()
 		try:
 			message.receive(event.pathname)
-		except SmircRawMessageException as e:
-			logging.error('raw message exception occurred while receiving messages %s: %s' % (event.pathname, e))
 		except (SmircCommandException, SmircMessageException) as e:
 			response.body = str(e)
 			response.system = True
+		except SmircOutOfAreaException as e:
+			logging.warning('message out of area exception: %s' % (str(e)))
+		except SmircRawMessageException as e:
+			logging.error('raw message exception occurred while receiving messages %s: %s' % (event.pathname, e))
 		except Exception as e:
 			logging.exception('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
 		else:

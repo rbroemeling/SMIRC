@@ -4,7 +4,8 @@
 		"pk": 204,
 		"fields": {
 			"region": "Manitoba",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -12,7 +13,8 @@
 		"pk": 226,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -20,7 +22,8 @@
 		"pk": 249,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -28,7 +31,8 @@
 		"pk": 250,
 		"fields": {
 			"region": "British Columbia",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -36,7 +40,8 @@
 		"pk": 289,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -44,7 +49,8 @@
 		"pk": 306,
 		"fields": {
 			"region": "Saskatchewan",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -52,7 +58,8 @@
 		"pk": 343,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -60,7 +67,8 @@
 		"pk": 365,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -68,7 +76,8 @@
 		"pk": 403,
 		"fields": {
 			"region": "Alberta",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -76,7 +85,8 @@
 		"pk": 416,
 		"fields": {
 			"region": "Toronto, Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -84,7 +94,8 @@
 		"pk": 418,
 		"fields": {
 			"region": "Quebec",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -92,7 +103,8 @@
 		"pk": 438,
 		"fields": {
 			"region": "Montreal, Quebec",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -100,7 +112,8 @@
 		"pk": 450,
 		"fields": {
 			"region": "Quebec",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -108,7 +121,8 @@
 		"pk": 506,
 		"fields": {
 			"region": "New Brunswick",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -116,7 +130,8 @@
 		"pk": 514,
 		"fields": {
 			"region": "Montreal, Quebec",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -124,7 +139,8 @@
 		"pk": 519,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -132,7 +148,8 @@
 		"pk": 579,
 		"fields": {
 			"region": "Quebec",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -140,7 +157,8 @@
 		"pk": 581,
 		"fields": {
 			"region": "Quebec",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -148,7 +166,8 @@
 		"pk": 587,
 		"fields": {
 			"region": "Alberta",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -156,7 +175,8 @@
 		"pk": 604,
 		"fields": {
 			"region": "British Columbia",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -164,7 +184,8 @@
 		"pk": 613,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -172,7 +193,8 @@
 		"pk": 647,
 		"fields": {
 			"region": "Toronto, Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -180,7 +202,8 @@
 		"pk": 705,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -188,7 +211,8 @@
 		"pk": 709,
 		"fields": {
 			"region": "Newfoundland",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -196,7 +220,8 @@
 		"pk": 778,
 		"fields": {
 			"region": "British Columbia",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -204,7 +229,8 @@
 		"pk": 780,
 		"fields": {
 			"region": "Alberta",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -212,7 +238,8 @@
 		"pk": 807,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -220,7 +247,8 @@
 		"pk": 819,
 		"fields": {
 			"region": "Quebec",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -228,7 +256,8 @@
 		"pk": 867,
 		"fields": {
 			"region": "Northwest Territories",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -236,7 +265,8 @@
 		"pk": 873,
 		"fields": {
 			"region": "Quebec",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -244,7 +274,8 @@
 		"pk": 902,
 		"fields": {
 			"region": "Nova Scotia",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	},
 	{
@@ -252,7 +283,8 @@
 		"pk": 905,
 		"fields": {
 			"region": "Ontario",
-			"country": "CA"
+			"country": "CA",
+			"country_code": 1
 		}
 	}
 ]

@@ -12,6 +12,9 @@ from smirc.chat.models import SmircException
 from smirc.chat.models import UserProfile
 from smirc.command.models import SmircCommand
 
+class SmircOutOfAreaException(SmircException):
+	pass
+
 class SmircMessageException(SmircException):
 	pass
 
@@ -23,9 +26,27 @@ class AreaCode(models.Model):
 		('CA', 'Canada'),
 		('USA', 'United States of America')
 	)
-	area_code = models.PositiveSmallIntegerField(primary_key=True) 
+	area_code = models.PositiveSmallIntegerField(primary_key=True)
+	country_code = models.PositiveSmallIntegerField()
 	region = models.CharField(max_length=32)
 	country = models.CharField(max_length=32, choices=COUNTRY_CHOICES)
+
+	@staticmethod
+	def validate_phone_number(s):
+		try:
+			country_code = s[0]
+			area_code = s[1:4]
+		except IndexError:
+			logging.debug('invalid phone number failed validation: %s' % (s))
+			pass
+		else:
+			try:
+				AreaCode.objects.get(area_code__exact=area_code, country_code__exact=country_code)
+				return True
+			except AreaCode.DoesNotExist:
+				logging.debug('phone number %s failed validation due to unknown country code (%s) or area code (%s)' % (s, country_code, area_code))
+				pass
+		return False
 
 class MessageSkeleton(models.Model):
 	body = None
@@ -38,7 +59,10 @@ class MessageSkeleton(models.Model):
 	def receive(self, data):
 		self.raw_receive(data)
 		logging.debug('received message "%s" from %s' % (self.raw_body, self.raw_phone_number))
-
+		
+		if not AreaCode.validate_phone_number(self.raw_phone_number):
+			raise SmircOutOfAreaException('phone number %s is out of SMIRC service area, ignoring message' % (self.raw_phone_number))
+		
 		if self.raw_body is None:
 			raise SmircMessageException('null message body')
 		self.raw_body = self.raw_body.strip()
