@@ -46,7 +46,7 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 				try:
 					response.body = message.command.execute()
 				except SmircCommandException as e:
-					response.boxy = str(e)
+					response.body = str(e)
 				response.system = True
 			else:
 				# TODO: deal with the message in message.body, sent by message.sender to message.conversation
