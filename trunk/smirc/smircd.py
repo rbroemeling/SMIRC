@@ -59,7 +59,7 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 				message.sender.last_active = datetime.datetime.utcnow()
 				message.sender.save()
 				try:
-					for recipient in Membership.objects.exclude(user__id__exact=message.sender.user).get(conversation=message.sender):
+					for recipient in Membership.objects.exclude(user=message.sender.user).get(conversation=message.sender):
 						message.send(recipient.user.get_profile().phone_number)
 				except Membership.DoesNotExist:
 					pass		
