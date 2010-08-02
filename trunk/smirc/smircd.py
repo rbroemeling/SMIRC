@@ -32,10 +32,11 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 	def process_IN_MODIFY(self, event):
 		logging.debug('event IN_MODIFY occurred for %s' % event.pathname)
 		message = SMSToolsMessage()
-		response = SMSToolsMessage()
+		response = None
 		try:
 			message.receive(event.pathname)
 		except (SmircCommandException, SmircMessageException) as e:
+			response = SMSToolsMessage()
 			response.body = str(e)
 			response.system = True
 		except SmircOutOfAreaException as e:
@@ -46,20 +47,26 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 			logging.exception('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
 		else:
 			if (message.command):
+				response = SMSToolsMessage()
 				try:
 					response.body = message.command.execute()
 				except SmircCommandException as e:
 					response.body = str(e)
 				response.system = True
 			else:
-				# TODO: deal with the message in message.body, sent by message.sender to message.conversation
-				pass		
-		if response.body:
+				message.sender.last_active = datetime.datetime.utcnow()
+				message.sender.save()
+				try:
+					for recipient in Membership.objects.exclude(user__id__exact=sender.user).get(conversation=sender):
+						message.send(recipient.user.get_profile().phone_number)
+				except Membership.DoesNotExist:
+					pass		
+		os.rename(event.pathname, '%s/archived/%s' % (settings.SMSTOOLS['inbound_dir'], os.path.basename(event.pathname)))
+		if response is not None:
 			try:
 				response.send(message.raw_phone_number)
 			except Exception as e:
 				logging.error('unhandled exception occurred while sending message to %s: %s' % (message.raw_phone_number, e))
-		os.rename(event.pathname, '%s/archived/%s' % (settings.SMSTOOLS['inbound_dir'], os.path.basename(event.pathname)))
 
 def signal_handler(signum, frame):
 	global smircd_terminate

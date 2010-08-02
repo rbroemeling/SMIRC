@@ -61,13 +61,13 @@ class MessageSkeleton(models.Model):
 		logging.debug('received message "%s" from %s' % (self.raw_body, self.raw_phone_number))
 		
 		if not AreaCode.validate_phone_number(self.raw_phone_number):
-			raise SmircOutOfAreaException('phone number %s is out of SMIRC service area, ignoring message' % (self.raw_phone_number))
+			raise SmircOutOfAreaException('disregarding message from outside of SMIRC service area (%s)' % (self.raw_phone_number))
 		
 		if self.raw_body is None:
-			raise SmircMessageException('null message body')
+			raise SmircMessageException('disregarding null message')
 		self.raw_body = self.raw_body.strip()
 		if self.raw_body == '':
-			raise SmircMessageException('empty message body')
+			raise SmircMessageException('disregarding empty message')
 
 		try:
 			user = UserProfile.load_user(self.raw_phone_number)
@@ -79,7 +79,7 @@ class MessageSkeleton(models.Model):
 		if self.command:
 			return
 		if user is None:
-			raise SmircMessageException('unknown sender %s -- maybe you are not registered? Please visit www.smirc.com to register.' % (self.raw_phone_number))
+			raise SmircMessageException('unknown sender (%s) -- maybe you are not registered? Please use %sNICK to register or see www.smirc.com for help.' % (self.raw_phone_number, SmircCommand.COMMAND_CHARACTER))
 
 		conversation_match = re.match('^@(\S*)\s*(.*)', self.raw_body)
 		if conversation_match:
@@ -93,20 +93,22 @@ class MessageSkeleton(models.Model):
 			try:
 				self.sender = Membership.objects.filter(user__id__exact=user.id).order_by('last_active').reverse()[0]
 			except IndexError:
-				raise SmircMessageException('no target conversation defined and no default conversation found')
-		# TODO: remember to update self.sender.last_active timestamp
+				raise SmircMessageException('you did not target a conversation, and you have no last-active (default) conversation')
 
 	def send(self, phone_number):
 		if self.body is None:
-			raise SmircMessageException('null message body')
+			raise SmircMessageException('disregarding null message')
+		self.body = self.body.strip()
+		if self.body == '':
+			raise SmircMessageException('disregarding empty message')
+
 		if self.system:
 			message = 'SMIRC: %s' % (self.body)		
 		else:
-			if self.conversation is None:
-				raise SmircMessageException('null message conversation')
-			if self.user is None:
-				raise SmircMessageException('null message sender')
-			message = '%s@%s: %s' % (self.user.username, self.conversation.name, self.body)
+			if self.sender is None:
+				raise SmircMessageException('disregarding message with invalid (null) sender')
+			message = '%s@%s: %s' % (self.sender.user.username, self.sender.conversation.name, self.body)
+
 		message = message[:140]
 		logging.debug('sending message "%s" to %s' % (message, phone_number))
 		return self.raw_send(phone_number, message)
