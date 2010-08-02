@@ -109,6 +109,7 @@ class SmircCommandCreate(SmircCommand):
 			raise SmircCommandException('you are already taking part in a conversation named %s' % (self.arguments['conversation_identifier']))
 
 class SmircCommandHelp(SmircCommand):
+	ANONYMOUSLY_EXECUTABLE = True
 	ARGUMENTS_REGEX = '(?P<command>\S+)?\s*$'
 	
 	def execute(self):
@@ -163,7 +164,13 @@ class SmircCommandInvite(SmircCommand):
 		i.inviter = self.executor
 		i.conversation = membership.conversation
 		i.save()
-		# TODO: send message to self.arguments['user'], alerting them that they have been invited to i.conversation
+		
+		# TODO: make the below actually do the right thing.
+		#notification = SMSToolsMessage()
+		#notification.body = 'you have been invited to a conversation named %s by %s.  Respond with /join %s to accept the invitation.' % (membership.conversation.name, self.executor.username, membership.conversation.name)
+		#notification.system = True
+		#notification.send(self.arguments['user'].get_profile().phone_number)
+
 		return 'user %s has been invited to the conversation named %s' % (self.arguments['user'].username, membership.conversation.name)
 
 class SmircCommandJoin(SmircCommand):
