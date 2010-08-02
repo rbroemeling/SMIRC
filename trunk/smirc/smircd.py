@@ -59,6 +59,7 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 				response.send(message.raw_phone_number)
 			except Exception as e:
 				logging.error('unhandled exception occurred while sending message to %s: %s' % (message.raw_phone_number, e))
+		os.rename(event.pathname, '%s/archived/%s' % (settings.SMSTOOLS['inbound_dir'], os.path.basename(event.pathname)))
 
 def signal_handler(signum, frame):
 	global smircd_terminate
@@ -105,12 +106,15 @@ def smircd_sanity_check():
 
 	if errors > 0:
 		sys.exit(-2)
-
+	
 smircd_terminate = False
 
 if __name__ == '__main__':
 	logging.debug('settings.SMSTOOLS: %s', str(settings.SMSTOOLS))
 	smircd_sanity_check()
+
+	if not os.path.exists('%s/archived' % (settings.SMSTOOLS['inbound_dir'])):
+		os.mkdir('%s/archived' % (settings.SMSTOOLS['inbound_dir']))
 
 	signal.signal(signal.SIGHUP, signal_handler)
 	signal.signal(signal.SIGINT, signal_handler)
