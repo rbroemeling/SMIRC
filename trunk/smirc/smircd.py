@@ -21,6 +21,7 @@ import pyinotify
 import signal
 import sys
 from django.conf import settings
+from smirc.chat.models import Membership
 from smirc.command.models import SmircCommandException
 from smirc.message.models import SmircMessageException
 from smirc.message.models import SmircOutOfAreaException
