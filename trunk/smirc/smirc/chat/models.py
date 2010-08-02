@@ -76,8 +76,8 @@ class Membership(models.Model):
 			u = UserProfile.load_user(u)
 		except User.DoesNotExist:
 			raise Membership.DoesNotExist
-		assert isinstance(c, str) or isinstance(c, Conversation), "load_membership(u, c): c is not Membership, Conversation, or string: %s" % (type(c)) 
-		if isinstance(c, str):
+		assert isinstance(c, str) or isinstance(c, unicode) or isinstance(c, Conversation), "load_membership(u, c): c is not Membership, Conversation, or string: %s" % (type(c)) 
+		if isinstance(c, str) or isinstance(c, unicode):
 			return Membership.objects.get(conversation__name__iexact=c, user__id__exact=u.id)
 		elif isinstance(c, Conversation):
 			return Membership.objects.get(conversation__id__exact=c.id, user__id__exact=u.id)
@@ -107,7 +107,7 @@ class UserProfile(models.Model):
 			return u
 		if isinstance(u, UserProfile):
 			return u.user
-		assert isinstance(u, str), "load_user(u): u is not User, UserProfile, or string: %s" % (type(u))
+		assert isinstance(u, str) or isinstance(u, unicode), "load_user(u): u is not User, UserProfile, or string: %s" % (type(u))
 		if re.match('^[0-9]+$', u):
 			try:
 				profile = UserProfile.objects.get(phone_number=u)
