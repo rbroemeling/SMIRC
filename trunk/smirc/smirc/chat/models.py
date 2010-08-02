@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 import datetime
+import logging
 import re
 
 class SmircException(Exception):
@@ -9,7 +10,10 @@ class SmircException(Exception):
 		self.value = value
 
 	def __str__(self):
-		if isinstance(self.value, str):
+		return unicode(self).encode('utf-8')
+
+	def __unicode__(self):
+		if isinstance(self.value, str) or isinstance(self.value, unicode):
 			return self.value
 		else:
 			return repr(self.value)
