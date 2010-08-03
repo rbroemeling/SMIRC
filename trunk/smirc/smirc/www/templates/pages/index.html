@@ -6,6 +6,14 @@ div#create_account
 {
 	width: 11.0em;
 }
+
+div#alpha_warning
+{
+	background: #ffcccc;
+	color: #ff0000;
+	border: 2px solid;
+	font-weight: bold;
+}
 </style>
 {% endblock %}
 
@@ -38,6 +46,13 @@ div#create_account
 </form>
 <!-- END IF -->
 {% endcomment %}
+
+<div id="alpha_warning">
+	Please note that at present, SMIRC is still in the early stages of development.  Though it is open for
+	general use, it is rather unstable.  You are free to use it as you like, but please note that due to it's
+	instability no guarantees are offered or implied -- particularly as to the deliverability of messages sent
+	to it.
+</div>
 
 <h1>What is SMIRC?</h1>
 <p>
