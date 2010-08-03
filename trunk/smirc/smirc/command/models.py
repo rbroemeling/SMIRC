@@ -1,15 +1,4 @@
-from django.contrib.auth.models import User
-from smirc.chat.models import Conversation
-from smirc.chat.models import Invitation
-from smirc.chat.models import Membership
 from smirc.chat.models import SmircException
-from smirc.chat.models import SmircRestrictedNameException
-from smirc.chat.models import UserProfile
-import inspect
-import logging
-import re
-import string
-import sys
 
 class SmircCommandException(SmircException):
 	pass
@@ -30,7 +19,7 @@ class SmircCommand:
 		if match:
 			self.arguments = match.groupdict()
 		else:
-			raise SmircCommandException('invalid arguments given, try %s' % (SmircCommand.usage(self)))
+			raise SmircCommandException('invalid arguments given, try "%s"' % (SmircCommand.usage(self)))
 		if 'user' in self.arguments:
 			try:
 				u = UserProfile.load_user(self.arguments['user'])
@@ -128,7 +117,7 @@ class SmircCommandHelp(SmircCommand):
 					name = name.replace('SmircCommand', '')
 					if name:
 						commands.append(name.upper())
-			return 'Commands: %s. Use /HELP [command]' % (string.join(commands, ', '))
+			return 'Commands: %s. Use %sHELP [command]' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
 	
 class SmircCommandInvite(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+to\s+(?P<conversation_identifier>\S+)\s*$'
@@ -165,11 +154,10 @@ class SmircCommandInvite(SmircCommand):
 		i.conversation = membership.conversation
 		i.save()
 		
-		# TODO: make the below actually do the right thing.
-		#notification = SMSToolsMessage()
-		#notification.body = 'you have been invited to a conversation named %s by %s.  Respond with /join %s to accept the invitation.' % (membership.conversation.name, self.executor.username, membership.conversation.name)
-		#notification.system = True
-		#notification.send(self.arguments['user'].get_profile().phone_number)
+		notification = SMSToolsMessage()
+		notification.body = 'you have been invited to the conversation "%s" by %s.  Respond with "%sjoin %s in %s" to accept the invitation.' % (membership.conversation.name, self.executor.username, SmircCommand.COMMAND_CHARACTER, self.executor.username, membership.conversation.name)
+		notification.system = True
+		notification.send(self.arguments['user'].get_profile().phone_number)
 
 		return 'user %s has been invited to the conversation named %s' % (self.arguments['user'].username, membership.conversation.name)
 
@@ -290,3 +278,16 @@ class SmircCommandPart(SmircCommand):
 		except Membership.DoesNotExist:
 			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
 		membership.delete()
+	
+from django.contrib.auth.models import User
+from smirc.chat.models import Conversation
+from smirc.chat.models import Invitation
+from smirc.chat.models import Membership
+from smirc.chat.models import SmircRestrictedNameException
+from smirc.chat.models import UserProfile
+from smirc.message.models import SMSToolsMessage
+import inspect
+import logging
+import re
+import string
+import sys
