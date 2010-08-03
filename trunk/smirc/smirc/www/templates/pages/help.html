@@ -39,12 +39,49 @@
 		If you would like to join SMIRC, just send a text message to SMIRC (at the phone number 780-729-1450) telling it what you want your user nickname to be.
 		This nickname will be automatically prepended to all text messages that you send through SMIRC, so it is usually a good idea for it to be shorter rather
 		than longer.  User nicknames must start with a letter (A-Z) and can only contain alphanumeric characters (A-Z and 0-9).  As an example, the command to
-		join if you want your user nickname to be "Foo" is given below:
+		join if you want your user nickname to be "Bob" is given below:
 	</p>
-	<code>
-		/NICK Foo
-	</code>
+	<code>/NICK Bob</code>
 
+	<h2>Creating a Conversation</h2>
+	<p>
+		Now that you and your friends are SMIRC members, it's time to use it to have a conversation amongst yourselves.  The first step to having a conversation
+		is to create a "conversation" on SMIRC that has all the people that you want to talk to at the same time in it.  To do this, just send SMIRC a create
+		command and tell it what you want your conversation to be called.  As an example, the command to create a conversation named "Talk" is given below:
+	</p>
+	<code>/CREATE Talk</code>
+	
+	<h2>Inviting People to Your Conversation</h2>
+	<p>
+		You are now in a conversation, but being in a conversation all by yourself doesn't really achieve anything, so next you need to invite the people
+		that you want to participate in the conversation to join you.  To do this, send SMIRC an invite command for each user that you want to invite to
+		participate in the conversation.  As an example, commands are given below to invite Bill, Dave, and Steve to the conversation Talk:
+	</p>
+	<code>/INVITE Bill to Talk</code>
+	<code>/INVITE Dave to Talk</code>
+	<code>/INVITE Steve to Talk</code>
+	
+	<h2>Joining a Conversation</h2>
+	<p>
+		As a SMIRC user, you will receive a notification message whenever you are invited to participate in a conversation.  If you wish to
+		join the conversation, just respond to the notification with a join request, letting SMIRC know that you do want to join that conversation.
+		If you do not wish to join the conversation, just ignore the invitation.  As an example, the command given below joins "Bob" in the conversation
+		"Talk":
+	</p>
+	<code>/JOIN Bob in Talk</code>
+	
+	<h2>Carrying on a Conversation</h2>
+	<p>
+		To send a message to a conversation that you are participating in, just prepend the text of the message with "@[conversation name]".  As an example,
+		the command given below sends the message "Hello, World!" to all of the participants in the conversation "Talk":
+	</p>
+	<code>@Talk Hello, World!</code>
+	<p>
+		When other people receive your message, it will be prepended with your user nickname.  For example, if Bob sent the above "Hello, World!" message,
+		then it would appear like this to Bill, Dave, and Steve:
+	</p>
+	<code>Bob@Talk Hello, World!</code>
+	
 	<h1>SMIRC Command Documentation</h1>
 	{% for i in command_usage_list %}
 		<div class="command">
