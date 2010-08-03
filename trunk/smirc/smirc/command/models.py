@@ -140,7 +140,7 @@ class SmircCommandCreate(SmircCommand):
 			raise SmircCommandException(str(e))
 
 		try:
-			Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
+			m = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
 		except Membership.DoesNotExist:
 			c = Conversation()
 			c.name = self.arguments['conversation_identifier']
@@ -152,7 +152,7 @@ class SmircCommandCreate(SmircCommand):
 			m.save()
 			return 'you have created a conversation named "%s"' % (c.name)
 		else:
-			raise SmircCommandException('you are already taking part in a conversation named "%s"' % (self.arguments['conversation_identifier']))
+			raise SmircCommandException('you are already taking part in a conversation named "%s"' % (m.conversation.name))
 
 class SmircCommandHelp(SmircCommand):
 	ANONYMOUSLY_EXECUTABLE = True
@@ -367,7 +367,7 @@ class SmircCommandPart(SmircCommand):
 		except Membership.DoesNotExist:
 			raise SmircCommandException('you are not in a conversation named "%s"' % (self.arguments['conversation_identifier']))
 		membership.delete()
-		return 'you have left the conversation "%s"' % (self.arguments['conversation_identifier'])
+		return 'you have left the conversation "%s"' % (membership.conversation.name)
 
 # We import smirc.* modules at the bottom (instead of at the top) as a fix for
 # circular import problems.
