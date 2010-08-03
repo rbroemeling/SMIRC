@@ -48,7 +48,7 @@ class SmircCommand:
 				if line == '':
 					break
 				description.append(line)
-		if length(description) == 0:
+		if len(description) == 0:
 			logging.error('no description defined for command class %s' % (repr(klass)))
 		return description
 
