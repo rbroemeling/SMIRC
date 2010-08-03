@@ -122,7 +122,7 @@ class SmircCommandHelp(SmircCommand):
 				if inspect.isclass(obj) and obj != SmircCommand and issubclass(obj, SmircCommand):
 					name = name.replace('SmircCommand', '')
 					commands.append(name.upper())
-			return 'Commands: %s. Use "%sHELP [command]"' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
+			return 'Commands: %s. Usage: "%sHELP [command]"' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
 	
 class SmircCommandInvite(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+to\s+(?P<conversation_identifier>\S+)\s*$'
