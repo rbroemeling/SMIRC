@@ -125,7 +125,7 @@ class SmircCommandHelp(SmircCommand):
 			return SmircCommand.usage(klass)
 		else:
 			commands = []
-			for klassname in SmircCommand.available_commands().keys():
+			for klassname in SmircCommand.available_commands().keys().sort():
 				commands.append(klassname.replace('SmircCommand', '').upper())
 			return 'Commands: %s. Usage: "%sHELP [command]"' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
 	
