@@ -9,7 +9,7 @@
 			padding: 5px;
 		}
 		
-		div.command h1
+		div.command h2
 		{
 			margin: 0px;
 			padding: 0px;
@@ -33,9 +33,22 @@
 {% endblock header %}
 
 {% block content %}
+	<h1>SMIRC Quickstart</h1>
+	<h2>Joining SMIRC</h2>
+	<p>
+		If you would like to join SMIRC, just send a text message to SMIRC (at the phone number 780-729-1450) telling it what you want your user nickname to be.
+		This nickname will be automatically prepended to all text messages that you send through SMIRC, so it is usually a good idea for it to be shorter rather
+		than longer.  User nicknames must start with a letter (A-Z) and can only contain alphanumeric characters (A-Z and 0-9).  As an example, the command to
+		join if you want your user nickname to be "Foo" is given below:
+	</p>
+	<code>
+		/NICK Foo
+	</code>
+
+	<h1>SMIRC Command Documentation</h1>
 	{% for i in command_usage_list %}
 		<div class="command">
-			<h1>{{ i.command }}</h1>
+			<h2>{{ i.command }}</h2>
 			<div class="usage">Usage: <code>{{ i.usage }}</code></div>
 			<div class="description">{{ i.description }}</div>
 			{% for j in i.examples %}
