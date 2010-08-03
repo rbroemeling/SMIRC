@@ -95,7 +95,8 @@ class MessageSkeleton(models.Model):
 				self.sender = Membership.objects.filter(user__id__exact=user.id).order_by('last_active').reverse()[0]
 			except IndexError:
 				raise SmircMessageException('you did not target a conversation, and you have no last-active (default) conversation')
-
+		logging.debug('message = "%s", target conversation = "%s", sender = "%s"' % (self.body, self.sender.conversation.name, self.sender.user.username))
+		
 	def send(self, phone_number):
 		if self.body is None:
 			raise SmircMessageException('disregarding null message')
