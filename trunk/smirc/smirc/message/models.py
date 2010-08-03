@@ -3,14 +3,9 @@ import os
 import re
 import stat
 import tempfile
-from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import User
-from smirc.chat.models import Conversation
-from smirc.chat.models import Membership
-from smirc.chat.models import SmircException
-from smirc.chat.models import UserProfile
-from smirc.command.models import SmircCommand
+from django.db import models
 
 class SmircOutOfAreaException(SmircException):
 	pass
@@ -79,7 +74,7 @@ class MessageSkeleton(models.Model):
 		if self.command:
 			return
 		if user is None:
-			raise SmircMessageException('unknown sender (%s) -- maybe you are not registered? Please use %sNICK to register or see www.smirc.com for help.' % (self.raw_phone_number, SmircCommand.COMMAND_CHARACTER))
+			raise SmircMessageException('unknown sender (%s) -- maybe you are not registered? Please use "%sNICK <your nick>" to register or see www.smirc.com for help.' % (self.raw_phone_number, SmircCommand.COMMAND_CHARACTER))
 
 		conversation_match = re.match('^@(\S*)\s*(.*)', self.raw_body)
 		if conversation_match:
@@ -151,56 +146,9 @@ class SMSToolsMessage(MessageSkeleton):
 		f.close()
 		return path
 
-# TODO: Move these unit tests elsewhere.
-# import os
-# import unittest
-# 
-# class SMSToolsMessageTestCase(unittest.TestCase):
-	# def setUp(self):
-		# open('/tmp/permissionerror.message', 'w').close()
-		# os.chmod('/tmp/permissionerror.message', 0)
-		# open('/tmp/empty.message', 'w').close()
-		# with open('/tmp/unknownuser.message', 'w') as f:
-			# f.write("""From: 491721234567
-# From_SMSC: 491722270333
-# Sent: 00-02-21 22:26:23
-# Received: 00-02-21 22:26:29
-# Subject: modem1
-# Alphabet: ISO
-# UDH: false
-# 
-# This is the Text that I have sent with my mobile phone to the computer.""")
-		# self.msg = SMSToolsMessage()
-# 
-	# def tearDown(self):
-		# os.remove('/tmp/permissionerror.message')
-		# os.remove('/tmp/empty.message')
-		# os.remove('/tmp/unknownuser.message')
-# 
-	# def test_receive_empty(self):
-		# self.assertEqual(self.msg.raw_receive('/tmp/empty.message'), (None, None))
-		# try:
-			# self.assertRaises(SmircMessageException, self.msg.receive('/tmp/empty.message'))
-		# except SmircMessageException:
-			# pass
-# 
-	# def test_receive_nonexistent(self):
-		# self.assertEqual(self.msg.raw_receive('/tmp/nonexistent.message'), (None, None))
-		# try:
-			# self.assertRaises(SmircMessageException, self.msg.receive('/tmp/nonexistent.message'))
-		# except SmircMessageException:
-			# pass
-# 
-	# def test_receive_permissionerror(self):
-		# self.assertEqual(self.msg.raw_receive('/tmp/permissionerror.message'), (None, None))
-		# try:
-			# self.assertRaises(SmircMessageException, self.msg.receive('/tmp/permissionerror.message'))
-		# except SmircMessageException:
-			# pass
-# 
-	# def test_receive_unknownuser(self):
-		# self.assertEqual(self.msg.raw_receive('/tmp/unknownuser.message'), ('491721234567', 'This is the Text that I have sent with my mobile phone to the computer.'))
-		# try:
-			# self.assertRaises(SmircMessageException, self.msg.receive('/tmp/unknownuser.message'))
-		# except SmircMessageException:
-			# pass
+# We import smirc.* modules at the bottom (instead of at the top) as a fix for
+# circular import problems.
+from smirc.chat.models import Membership
+from smirc.chat.models import SmircException
+from smirc.chat.models import UserProfile
+from smirc.command.models import SmircCommand

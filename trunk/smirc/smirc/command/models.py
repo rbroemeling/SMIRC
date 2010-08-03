@@ -1,3 +1,9 @@
+import inspect
+import logging
+import re
+import string
+import sys
+from django.contrib.auth.models import User
 from smirc.chat.models import SmircException
 
 class SmircCommandException(SmircException):
@@ -278,16 +284,12 @@ class SmircCommandPart(SmircCommand):
 		except Membership.DoesNotExist:
 			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
 		membership.delete()
-	
-from django.contrib.auth.models import User
+
+# We import smirc.* modules at the bottom (instead of at the top) as a fix for
+# circular import problems.
 from smirc.chat.models import Conversation
 from smirc.chat.models import Invitation
 from smirc.chat.models import Membership
 from smirc.chat.models import SmircRestrictedNameException
 from smirc.chat.models import UserProfile
 from smirc.message.models import SMSToolsMessage
-import inspect
-import logging
-import re
-import string
-import sys
