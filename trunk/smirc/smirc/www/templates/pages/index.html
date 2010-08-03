@@ -39,8 +39,6 @@ div#create_account
 <!-- END IF -->
 {% endcomment %}
 
-SMIRC
-
 <h1>What is SMIRC?</h1>
 <p>
 	SMIRC (Short Message Internet Relay Chat) is a fusion of <a href="http://en.wikipedia.org/wiki/Short_Message_Service">Short Message Service</a>
@@ -48,9 +46,22 @@ SMIRC
 	A typical SMS (text message) sent from a phone is targeted to a single recipient and although phones are getting smarter and better able to send
 	multi-recipient text messages the ability to have a multi-person conversation (as is common in e-mail) is still largely missing.  SMIRC's goal is
 	to expose this functionality to it's users, so that they are able to quickly and easily have multi-recipient conversations.  On SMIRC, therefore,
-	a message is targeted at a <i>room of people</i>, rather than at <i>a person</i>.
+	a message is targeted at <i>a conversation</i>, rather than at <i>a person</i>.
 </p>
 
+<h1>How does it work?</h1>
+<p>
+	SMIRC works by receiving messages on a phone number (currently SMIRC is available in Canada only, at the phone number 780-729-1450) and then
+	relaying them (copying them) to all of the people in the target conversation.  As a simple example of how this works in practice, assuming that there are three
+	friends (we'll call them "Zim", "Gir", and "Tallest") who are all in the SMIRC conversation "OID2" together:
+	
+	Zim sends the text message <code>@OID2 Come, GIR.  Let us rain some doom down upon the heads of our doomed enemies.</code> to SMIRC.  Upon receipt of the message,
+	SMIRC determines that it is targeted at the conversation "OID2" (which Zim is a member of), and then forwards it to all the other participants of that
+	conversation (in this case, Gir and Tallest).  Gir and Tallest then both receive the text
+	<code>Zim@OID2: Come, GIR.  Let us rain some doom down upon the heads of our doomed enemies.</code> in a text message from SMIRC.
+</p>
+
+{% comment %}
 <h1>How does it work?  What does it look like?</h1>
 <p>
 	An example of how SMIRC can work: let's assume that there are three friends (we'll call them Zim, Gir, and Tallest) who want to have conversations
@@ -58,6 +69,36 @@ SMIRC
 	that they sent... and if Gir (for example) hit "reply" to a text message from Zim and forgot to add Tallest as a recipient, then only Zim would receive
 	the message and Tallest might be out of the loop.  Of course the Tallest won't stand for this, so all three join SMIRC and find that it
 	can make staying in sync easier:
+	
+	<div>
+	First, all three join SMIRC:
+	
+	<div>
+		<div>To: SMIRC<br>
+		<code>/NICK Zim</code>
+		</div>
+		<div>From: SMIRC<br>
+		<code>SMIRC: your nickname has been changed to Zim</code>
+		</div>
+	</div>
+
+	<div>
+		<div>To: SMIRC<br>
+		<code>/NICK Gir</code>
+		</div>
+		<div>From: SMIRC<br>
+		SMIRC: your nickname has been changed to Gir
+		</div>
+	</div>
+
+	<div>
+		<div>To: SMIRC<br>
+		/NICK Tallest
+		</div>
+		<div>From: SMIRC<br>
+		SMIRC: your nickname has been changed to Tallest
+		</div>
+	</div>
 	
 	<table>
 		<thead>
@@ -69,16 +110,14 @@ SMIRC
 		</thead>
 		<tbody>
 			<tr>
-				<td>To: SMIRC<br>
-				/NICK Zim</td>
+				<td></td>
 				<td>To: SMIRC<br>
 				/NICK Gir</td>
 				<td>To: SMIRC<br>
 				/NICK Tallest</td>
 			</tr>
 			<tr style="border-bottom: 2px solid;">
-				<td>From: SMIRC<br>
-				SMIRC: your nickname has been changed to Zim</td>
+				<td></td>
 				<td>From: SMIRC<br>
 				SMIRC: your nickname has been changed to Gir</td>
 				<td>From: SMIRC<br>
@@ -178,4 +217,6 @@ SMIRC
 		</tbody>
 	</table>
 </p>
+{% endcomment %}
+
 {% endblock %}
