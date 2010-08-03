@@ -367,7 +367,7 @@ class SmircCommandPart(SmircCommand):
 		except Membership.DoesNotExist:
 			raise SmircCommandException('you are not in a conversation named "%s"' % (self.arguments['conversation_identifier']))
 		membership.delete()
-		return 'you have left the conversation "%s"' % (self.arguments['conversation_identifier']))
+		return 'you have left the conversation "%s"' % (self.arguments['conversation_identifier'])
 
 # We import smirc.* modules at the bottom (instead of at the top) as a fix for
 # circular import problems.
