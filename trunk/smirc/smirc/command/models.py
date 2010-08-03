@@ -394,7 +394,7 @@ class SmircCommandWho(SmircCommand):
 				member = member[:member.rfind('@')]
 			members.append(member)
 		members.sort()
-		members = string.join(members, ', ')
+		members = 'in %s: %s' % (membership.conversation.name, string.join(members, ', '))
 		if len(members) > 130:
 			members = members[:125]
 			members = members[:members.rfind(',')]
