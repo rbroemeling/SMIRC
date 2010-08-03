@@ -38,23 +38,25 @@
 	</head>
 	<body>
 		<div id="content">
-			<!-- IF user is not logged in... -->
-			<form>
-				<div class="form_container" id="login">
-					<div class="form_element">
-						<div class="form_label"><label for="login">Username or Phone Number</label></div>
-						<div class="form_input"><input name="login" type="text" size="24" /></div>
+			{#
+				<!-- IF user is not logged in... -->
+				<form>
+					<div class="form_container" id="login">
+						<div class="form_element">
+							<div class="form_label"><label for="login">Username or Phone Number</label></div>
+							<div class="form_input"><input name="login" type="text" size="24" /></div>
+						</div>
+						<div class="form_element">
+							<div class="form_label"><label for="password">Password</label></div>
+							<div class="form_input"><input name="password" type="password" size="24" /></div>
+						</div>
+						<div class="form_element">
+							<div class="form_input submit"><input type="submit" value="Login" /></div>
+						</div>
 					</div>
-					<div class="form_element">
-						<div class="form_label"><label for="password">Password</label></div>
-						<div class="form_input"><input name="password" type="password" size="24" /></div>
-					</div>
-					<div class="form_element">
-						<div class="form_input submit"><input type="submit" value="Login" /></div>
-					</div>
-				</div>
-			</form>
-			<!-- END IF -->
+				</form>
+				<!-- END IF -->
+			#}
 			{% block content %}{% endblock content %}
 		</div>
 	</body>
