@@ -56,10 +56,18 @@ div#create_account
 	friends (we'll call them "Zim", "Gir", and "Tallest") who are all in the SMIRC conversation "OID2" together:
 	
 	<ol>
-		<li>Zim sends the text message "<code>@OID2 Come, GIR.  Let us rain some doom down upon the heads of our doomed enemies.</code>" to SMIRC.</li>
-		<li>Upon receipt of the message, SMIRC determines that it is targeted at the conversation "OID2" (which Zim is a member of), and then
-		forwards it to all the other participants of that conversation (in this case, Gir and Tallest).</li>
-		<li>Gir and Tallest both receive the text message "<code>Zim@OID2: Come, GIR.  Let us rain some doom down upon the heads of our doomed enemies.</code>" from SMIRC.
+		<li>
+			Zim sends a text message to Smirc:
+			<code>@OID2 Come, GIR.  Let us rain some doom down upon the heads of our doomed enemies.</code>
+		</li>
+		<li>
+			Upon receipt of the message, SMIRC determines that it is targeted at the conversation "OID2" (which Zim is a member of), and then
+			forwards it to all the other participants of that conversation (in this case, Gir and Tallest).
+		</li>
+		<li>
+			Gir and Tallest both receive a text message from SMIRC:
+			<code>Zim@OID2: Come, GIR.  Let us rain some doom down upon the heads of our doomed enemies.</code>
+		</li>
 	</ol>
 </p>
 
