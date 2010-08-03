@@ -42,16 +42,42 @@ class SmircCommand:
 
 	@staticmethod
 	def command_description(klass):
-		description = []
+		description = ''
 		if klass.execute.__doc__:
 			for line in klass.execute.__doc__.splitlines():
 				line = line.strip()
 				if line == '':
 					break
-				description.append(line)
+				if len(description) > 0:
+					description = description + ' '
+				description = description + line
 		if len(description) == 0:
 			logging.error('no description defined for command class %s' % (repr(klass)))
 		return description
+
+	@staticmethod
+	def command_examples(klass):
+		examples = []
+		current_example = None
+		current_description = None
+		if klass.execute.__doc__:
+			for line in klass.execute.__doc__.splitlines():
+				line = line.strip()
+				if line == '':
+					if current_example is not None:
+						examples.append((current_example, current_description))
+					current_example = None
+					current_description = None
+				elif current_example is not None:
+					if len(current_description) > 0:
+						current_description = current_description + ' '
+					current_description = current_description + line
+				elif line[0:8] == 'Example:':
+					current_example = line[10:]
+					current_description = ''
+		if current_example is not None:
+			examples.append((current_example, current_description))
+		return examples
 
 	@staticmethod
 	def command_usage(klass):
@@ -103,9 +129,7 @@ class SmircCommandCreate(SmircCommand):
 		
 		/CREATE [conversation name]
 		
-		Example:
-		
-		/CREATE HelloWorld
+		Example: /CREATE HelloWorld
 		Creates a new SMIRC conversation called "HelloWorld" and automatically
 		joins the executing user to it with operator permissions.
 		"""
@@ -154,9 +178,15 @@ class SmircCommandInvite(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+to\s+(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self):
-		"""Invite a user to a conversation that you are an operator of.
+		"""Invite a user to a conversation that you are a member of and
+		that you have operator permissions in.
 
 		/INVITE [user to be invited] to [conversation name]
+
+		Example: /INVITE Foo to Bar
+		Invites the user "Foo" to the conversation "Bar", assuming that
+		you are a member of a conversation named "Bar" and that you have
+		operator permissions in it.
 		"""
 		try:
 			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])

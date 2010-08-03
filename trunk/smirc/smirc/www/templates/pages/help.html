@@ -7,23 +7,23 @@
 			border: 1px solid;
 			margin: 10px;
 			padding: 5px;
-
+		
 		}
-
+		
 		div.command h1
 		{
 			margin: 0px;
-
+		
 		}
-
+		
 		div.command div.usage
 		{
-
+		
 		}
-
+		
 		div.command div.description
 		{
-
+		
 		}
 	</style>
 {% endblock header %}
@@ -34,6 +34,12 @@
 			<h1>{{ i.command }}</h1>
 			<div class="usage">Usage: <code>{{ i.usage }}</code></div>
 			<div class="description">{{ i.description }}</div>
+			{% for j in i.examples %}
+				<div class="example">
+					Example: <code>{{ j.0 }}</code><br>
+					{{ j.1 }}
+				</div>
+			{% endfor %}
 		</div>
 	{% endfor %}
 {% endblock %}

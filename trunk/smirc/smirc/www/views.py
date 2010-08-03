@@ -1,4 +1,3 @@
-import string
 from django.shortcuts import render_to_response
 from smirc.command.models import SmircCommand
 
@@ -10,7 +9,8 @@ def help(request):
 	for klassname, obj in SmircCommand.available_commands():
 		command_usage_list.append({
 			'command': klassname.replace('SmircCommand', '').upper(),
-			'description': string.join(SmircCommand.command_description(obj), ' '),
+			'description': SmircCommand.command_description(obj),
+			'examples': SmircCommand.command_examples(obj),
 			'usage': SmircCommand.command_usage(obj)
 		})
 	command_usage_list.sort(key=lambda x: x['command'])
