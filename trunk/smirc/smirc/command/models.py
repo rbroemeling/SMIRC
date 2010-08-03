@@ -93,9 +93,9 @@ class SmircCommandCreate(SmircCommand):
 			m.mode_operator = True
 			m.user = self.executor
 			m.save()
-			return 'you have created a conversation named %s' % (c.name)
+			return 'you have created a conversation named "%s"' % (c.name)
 		else:
-			raise SmircCommandException('you are already taking part in a conversation named %s' % (self.arguments['conversation_identifier']))
+			raise SmircCommandException('you are already taking part in a conversation named "%s"' % (self.arguments['conversation_identifier']))
 
 class SmircCommandHelp(SmircCommand):
 	ANONYMOUSLY_EXECUTABLE = True
@@ -117,7 +117,7 @@ class SmircCommandHelp(SmircCommand):
 					name = name.replace('SmircCommand', '')
 					if name:
 						commands.append(name.upper())
-			return 'Commands: %s. Use %sHELP [command]' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
+			return 'Commands: %s. Use "%sHELP [command]"' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
 	
 class SmircCommandInvite(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+to\s+(?P<conversation_identifier>\S+)\s*$'
@@ -130,23 +130,23 @@ class SmircCommandInvite(SmircCommand):
 		try:
 			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
 		except Membership.DoesNotExist:
-			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
+			raise SmircCommandException('you are not in a conversation named "%s"' % (self.arguments['conversation_identifier']))
 		if not membership.mode_operator:
-			raise SmircCommandException('you are not an operator of the conversation named %s' % (membership.conversation.name))
+			raise SmircCommandException('you are not an operator of the conversation named "%s"' % (membership.conversation.name))
 				
 		try:
 			Membership.load_membership(self.arguments['user'], membership.conversation)
 		except Membership.DoesNotExist:
 			pass
 		else:
-			raise SmircCommandException('user %s is already a member of the conversation named %s' % (self.arguments['user'].username, membership.conversation.name))
+			raise SmircCommandException('user %s is already a member of the conversation named "%s"' % (self.arguments['user'].username, membership.conversation.name))
 
 		try:
 			Invitation.objects.get(invitee=self.arguments['user'], conversation=membership.conversation)
 		except Invitation.DoesNotExist:
 			pass
 		else:
-			raise SmircCommandException('user %s has already been invited to the conversation named %s' % (self.arguments['user'].username, membership.conversation.name))
+			raise SmircCommandException('user %s has already been invited to the conversation named "%s"' % (self.arguments['user'].username, membership.conversation.name))
 
 		i = Invitation()
 		i.invitee = self.arguments['user']
