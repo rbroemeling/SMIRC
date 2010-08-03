@@ -73,7 +73,7 @@ class SmircCommand:
 						current_description = current_description + ' '
 					current_description = current_description + line
 				elif line[0:8] == 'Example:':
-					current_example = line[10:]
+					current_example = line.replace('Example:', '').strip()
 					current_description = ''
 		if current_example is not None:
 			examples.append((current_example, current_description))
