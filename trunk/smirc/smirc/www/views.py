@@ -16,7 +16,7 @@ def help(request):
 	command_usage_list.sort(key=lambda x: x['command'])
 
 	return render_to_response('pages/help.html', {
-		'comchar': SmircCommand.COMMAND_CHARACTER,
+		'command_character': SmircCommand.COMMAND_CHARACTER,
 		'command_usage_list': command_usage_list
 	})
 
