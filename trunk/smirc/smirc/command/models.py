@@ -33,6 +33,13 @@ class SmircCommand:
 				raise SmircCommandException('user %s not found' % (self.arguments['user']))
 			else:
 				self.arguments['user'] = u
+	@staticmethod
+	def available_commands():
+		commands = {}
+		for name, obj in inspect.getmembers(sys.modules[__name__]):
+			if inspect.isclass(obj) and obj != SmircCommand and issubclass(obj, SmircCommand):
+				commands[name] = obj
+		return commands
 
 	def execute(self):
 		raise SmircCommandException('command %s has not yet been implemented' % (self.command))
@@ -118,10 +125,8 @@ class SmircCommandHelp(SmircCommand):
 			return SmircCommand.usage(klass)
 		else:
 			commands = []
-			for name, obj in inspect.getmembers(sys.modules[__name__]):
-				if inspect.isclass(obj) and obj != SmircCommand and issubclass(obj, SmircCommand):
-					name = name.replace('SmircCommand', '')
-					commands.append(name.upper())
+			for klassname in SmircCommand.available_commands().keys():
+				commands.append(klassname.replace('SmircCommand', '').upper())
 			return 'Commands: %s. Usage: "%sHELP [command]"' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
 	
 class SmircCommandInvite(SmircCommand):
