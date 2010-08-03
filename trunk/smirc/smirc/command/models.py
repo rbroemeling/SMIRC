@@ -35,11 +35,9 @@ class SmircCommand:
 				self.arguments['user'] = u
 	@staticmethod
 	def available_commands():
-		commands = {}
 		for name, obj in inspect.getmembers(sys.modules[__name__]):
 			if inspect.isclass(obj) and obj != SmircCommand and issubclass(obj, SmircCommand):
-				commands[name] = obj
-		return commands
+				yield (name, obj)
 
 	def execute(self):
 		raise SmircCommandException('command %s has not yet been implemented' % (self.command))
@@ -125,7 +123,7 @@ class SmircCommandHelp(SmircCommand):
 			return SmircCommand.usage(klass)
 		else:
 			commands = []
-			for klassname in SmircCommand.available_commands().keys().sort():
+			for klassname, obj in SmircCommand.available_commands().sort(key=lambda x: x[0]):
 				commands.append(klassname.replace('SmircCommand', '').upper())
 			return 'Commands: %s. Usage: "%sHELP [command]"' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
 	
