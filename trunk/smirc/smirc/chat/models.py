@@ -58,8 +58,17 @@ class Membership(models.Model):
 	mode_voice = models.BooleanField(default=False)
 	user = models.ForeignKey(User)
 
+	def __str__(self):
+		return unicode(self).encode('utf-8')
+
 	def __unicode__(self):
-		return '%s:%s' % (conversation.name, user.username)
+		if self.mode_operator:
+			usermode = '@'
+		elif self.mode_voice:
+			usermode = '+'
+		else:
+			usermode = ''
+		return '%s%s@%s' % (usermode, self.user.username, self.conversation.name)
 
 	@staticmethod
 	def load_membership(u, c):

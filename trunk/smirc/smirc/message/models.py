@@ -106,7 +106,7 @@ class MessageSkeleton(models.Model):
 		else:
 			if self.sender is None:
 				raise SmircMessageException('disregarding message with invalid (null) sender')
-			message = '%s@%s: %s' % (self.sender.user.username, self.sender.conversation.name, self.body)
+			message = '%s: %s' % (str(self.sender), self.body)
 
 		message = message[:140]
 		logging.debug('sending message "%s" to %s' % (message, phone_number))

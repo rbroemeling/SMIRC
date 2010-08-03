@@ -369,6 +369,37 @@ class SmircCommandPart(SmircCommand):
 		membership.delete()
 		return 'you have left the conversation "%s"' % (membership.conversation.name)
 
+class SmircCommandWho(SmircCommand):
+	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
+	
+	def execute(self):
+		"""List all of the people in a conversation that you are
+		currently a member of.
+		
+		/WHO [conversation you are in]
+		
+		Example: /WHO Foo
+		Fetches a list of people who are currently in the conversation
+		named "Foo" (that you are also a member of).
+		"""
+		try:
+			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
+		except Membership.DoesNotExist:
+			raise SmircCommandException('you are not in a conversation named "%s"' % (self.arguments['conversation_identifier']))
+
+		members = []
+		for membership in Membership.objects.filter(conversation=membership.conversation):
+			member = str(membership)
+			if member.rfind('@') > 0:
+				member = member[:member.rfind('@')]
+			members.append(member)
+		members = string.join(members, ', ')
+		if len(members) > 130:
+			members = members[:125]
+			members = members[:members.rfind(',')]
+			members = members + ', ...'
+		return members
+
 # We import smirc.* modules at the bottom (instead of at the top) as a fix for
 # circular import problems.
 from smirc.chat.models import Conversation
