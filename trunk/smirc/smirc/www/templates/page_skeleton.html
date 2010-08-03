@@ -38,7 +38,7 @@
 	</head>
 	<body>
 		<div id="content">
-			{#
+			{% comment %}
 				<!-- IF user is not logged in... -->
 				<form>
 					<div class="form_container" id="login">
@@ -56,7 +56,7 @@
 					</div>
 				</form>
 				<!-- END IF -->
-			#}
+			{% endcomment %}
 			{% block content %}{% endblock content %}
 		</div>
 	</body>
