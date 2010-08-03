@@ -25,7 +25,7 @@ class SmircCommand:
 		if match:
 			self.arguments = match.groupdict()
 		else:
-			raise SmircCommandException('invalid arguments given, try "%s"' % (SmircCommand.usage(self)))
+			raise SmircCommandException('invalid arguments given, try "%s"' % (SmircCommand.command_usage(self)))
 		if 'user' in self.arguments:
 			try:
 				u = UserProfile.load_user(self.arguments['user'])
@@ -38,6 +38,16 @@ class SmircCommand:
 		for name, obj in inspect.getmembers(sys.modules[__name__]):
 			if inspect.isclass(obj) and obj != SmircCommand and issubclass(obj, SmircCommand):
 				yield (name, obj)
+
+	@staticmethod
+	def command_usage(klass):
+		if klass.execute.__doc__:
+			for line in klass.execute.__doc__.splitlines():
+				line = line.strip()
+				if line[0:1] == SmircCommand.COMMAND_CHARACTER:
+					return line
+		logging.error('no usage information defined for %s' % (repr(klass)))
+		return ''
 
 	def execute(self):
 		raise SmircCommandException('command %s has not yet been implemented' % (self.command))
@@ -69,16 +79,6 @@ class SmircCommand:
 				return False
 		else:
 			raise SmircCommandException('bad command "%s", try %shelp' % (s, SmircCommand.COMMAND_CHARACTER))
-
-	@staticmethod
-	def usage(klass):
-		if klass.execute.__doc__:
-			for line in klass.execute.__doc__.splitlines():
-				line = line.strip()
-				if line[0:1] == SmircCommand.COMMAND_CHARACTER:
-					return line
-		logging.error('no usage information defined for %s' % (repr(klass)))
-		return ''
 
 class SmircCommandCreate(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
@@ -120,7 +120,7 @@ class SmircCommandHelp(SmircCommand):
 		"""
 		if self.arguments['command']:
 			klass = SmircCommand.fetch_command_class(self.arguments['command'])
-			return SmircCommand.usage(klass)
+			return SmircCommand.command_usage(klass)
 		else:
 			commands = []
 			for klassname, obj in SmircCommand.available_commands():
