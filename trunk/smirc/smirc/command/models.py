@@ -393,6 +393,7 @@ class SmircCommandWho(SmircCommand):
 			if member.rfind('@') > 0:
 				member = member[:member.rfind('@')]
 			members.append(member)
+		members.sort()
 		members = string.join(members, ', ')
 		if len(members) > 130:
 			members = members[:125]
