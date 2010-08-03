@@ -325,23 +325,30 @@ class SmircCommandNick(SmircCommand):
 			raise SmircCommandException(str(e))
 
 		try:
-			UserProfile.load_user(self.arguments['new_username'])
+			existing_user = UserProfile.load_user(self.arguments['new_username'])
 		except User.DoesNotExist:
-			if isinstance(self.executor, User):
-				self.executor.username = self.arguments['new_username']
-				self.executor.save()
-				return 'your nickname has been changed to %s' % (self.executor.username)
-			else:
-				u = User.objects.create_user(self.arguments['new_username'], '')
-				p = UserProfile()
-				p.phone_number = self.executor	
-				p.user = u
-				p.save()
-				self.executor = u
-				return 'welcome to SMIRC, %s' % (self.executor.username)
-
+			pass
 		else:
-			raise SmircCommandException('the nickname %s is already in use' % (self.arguments['new_username']))
+			if isinstance(self.executor, User) and existing_user.id == self.executor.id:
+				# There is an existing user with this name, but it is US, 
+				# so let the request continue.  This allows case adjustments to usernames.
+				pass
+			else:
+				# There is an existing user with this name and it isn't us,
+				# so report the error to the user.
+				raise SmircCommandException('sorry, the nickname %s is already in use' % (self.arguments['new_username']))
+		if isinstance(self.executor, User):
+			self.executor.username = self.arguments['new_username']
+			self.executor.save()
+			return 'nickname has been changed to %s' % (self.executor.username)
+		else:
+			u = User.objects.create_user(self.arguments['new_username'], '')
+			p = UserProfile()
+			p.phone_number = self.executor	
+			p.user = u
+			p.save()
+			self.executor = u
+			return 'welcome to SMIRC, %s' % (self.executor.username)
 
 class SmircCommandPart(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
