@@ -1,20 +1,11 @@
 {% extends "page_skeleton.html" %}
 
 {% block content %}
-	<table>
-		<thead>
-			<tr>
-				<th>Command</th>
-				<th>Usage</th>
-			</tr>
-		</thead>
-		<tbody>
-			{% for i in command_usage_list %}
-				<tr>
-					<td>{{ i.command }}</td>
-					<td>{{ i.usage }}</td>
-				</tr>
-			{% endfor %}
-		</tbody>
-	</table>
+	{% for i in command_usage_list %}
+		<div class="command">
+			<h1>{{ i.command }}</h1>
+			<div class="usage">{{ i.usage }}</div>
+			<div class="description">{{ i.description }}</div>
+		</div>
+	{% endfor %}
 {% endblock %}
