@@ -10,6 +10,8 @@ div#create_account
 {% endblock %}
 
 {% block content %}
+
+{% comment %}
 <!-- IF user is not logged in... -->
 <form>
 	<div class="form_container" id="create_account">
@@ -34,15 +36,196 @@ div#create_account
 		</div>
 	</div>
 </form>
+<!-- END IF -->
+{% endcomment %}
+
+SMIRC
 
 <h1>What is SMIRC?</h1>
 <p>
 	SMIRC (Short Message Internet Relay Chat) is a fusion of <a href="http://en.wikipedia.org/wiki/Short_Message_Service">Short Message Service</a>
 	(also known as "SMS" or "texting" to most any user of a cellphone) and <a href="http://en.wikipedia.org/wiki/Internet_Relay_Chat">Internet Relay Chat</a>.
-	SMIRC's goal is to ease the use of texting between groups of people: instead of sending a text to <i>a person</i>, on SMIRC a text is sent to <i>a room of people</i>.
+	A typical SMS (text message) sent from a phone is targeted to a single recipient and although phones are getting smarter and better able to send
+	multi-recipient text messages the ability to have a multi-person conversation (as is common in e-mail) is still largely missing.  SMIRC's goal is
+	to expose this functionality to it's users, so that they are able to quickly and easily have multi-recipient conversations.  On SMIRC, therefore,
+	a message is targeted at a <i>room of people</i>, rather than at <i>a person</i>.
 </p>
 
-<!-- END IF -->
-		
-
+<h1>How does it work?  What does it look like?</h1>
+<p>
+	An example of how SMIRC can work: let's assume that there are three friends (we'll call them Zim, Gir, and Tallest) who want to have conversations
+	through text messaging.  Typically, each of them would need to make very sure that they always listed all of the recipients for each text message
+	that they sent... and if Gir (for example) hit "reply" to a text message from Zim and forgot to add Tallest as a recipient, then only Zim would receive
+	the message and Tallest might be out of the loop.  Of course the Tallest won't stand for this, so all three join SMIRC and find that it
+	can make things easier:
+	
+	<table>
+		<thead>
+			<tr>
+				<th colspan='2'>Zim</th>
+				<th colspan='2'>Gir</th>
+				<th colspan='2'>Tallest</th>
+			</tr>
+			<tr>
+				<th>SMS Sent</th>
+				<th>SMS Received</th>
+				<th>SMS Sent</th>
+				<th>SMS Received</th>
+				<th>SMS Sent</th>
+				<th>SMS Received</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td class="sent">To: SMIRC<br>
+				/NICK Zim</td>
+				<td class="received"></td>
+				<td class="sent">To: SMIRC<br>
+				/NICK Gir</td>
+				<td class="received"></td>
+				<td class="sent">To: SMIRC<br>
+				/NICK Tallest</td>
+				<td class="received"></td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: your nickname has been changed to Zim</td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: your nickname has been changed to Gir
+				</td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: your nickname has been changed to Tallest
+				</td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent">To: SMIRC<br>
+				/CREATE OID2</td>
+				<td class="received"></td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: you have created a conversation named "OID2"</td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent">To: SMIRC<br>
+				/INVITE Zim to OID2</td>
+				<td class="received"></td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: you have been invited to the conversation "OID2" by Tallest.  Respond with "/JOIN Tallest in OID2" to accept the invitation.</td>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: Zim has been invited to the conversation named "OID2"</td>
+			</tr>
+			<tr>
+				<td class="sent">To: SMIRC<br>
+				/JOIN Tallest in OID2</td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent">To: SMIRC<br>
+				/INVITE Gir to OID2</td>
+				<td class="received"></td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: you have joined the conversation named "OID2"</td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: you have been invited to the conversation "OID2" by Tallest.  Respond with "/JOIN Tallest in OID2" to accept the invitation.</td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: Gir has been invited to the conversation named "OID2"</td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent">To: SMIRC<br>
+				/JOIN Tallest in OID2</td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received"></td>
+			</tr>
+			<tr>
+				<td class="sent">To: SMIRC<br>
+				@OID2 Come, GIR. Let us rain some doom down upon the heads of our doomed enemies.</td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				SMIRC: you have joined the conversation named "OID2"</td>
+				<td class="sent"></td>
+				<td class="received"></td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				Zim@OID2: Come, GIR. Let us rain some doom down upon the heads of our doomed enemies.</td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				Zim@OID2: Come, GIR. Let us rain some doom down upon the heads of our doomed enemies.</td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent">To: SMIRC<br>
+				I'm gonna sing the Doom Song now.</td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received"></td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				Gir@OID2: I'm gonna sing the Doom Song now.</td>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				Gir@OID2: I'm gonna sing the Doom Song now.</td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent"></td>
+				<td class="received"></td>
+				<td class="sent">To: SMIRC<br>
+				Fire some kinda laser... thingie at 'em; RIGHT NOW!</td>
+				<td class="received"></td>
+			</tr>
+			<tr>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				Tallest@OID2: Fire some kinda laser... thingie at 'em; RIGHT NOW!</td>
+				<td class="sent"></td>
+				<td class="received">From: SMIRC<br>
+				Tallest@OID2: Fire some kinda laser... thingie at 'em; RIGHT NOW!</td>
+				<td class="sent"></td>
+				<td class="received"></td>
+			</tr>			
+		</tbody>
+	</table>
+</p>
 {% endblock %}
