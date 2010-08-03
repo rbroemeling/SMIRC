@@ -46,7 +46,7 @@
 	<h2>Creating a Conversation</h2>
 	<p>
 		Now that you and your friends are SMIRC members, it's time to use it to have a conversation amongst yourselves.  The first step to having a conversation
-		is to create a "conversation" on SMIRC that has all the people that you want to talk to at the same time in it.  To do this, just send SMIRC a create
+		is to create a conversation on SMIRC that has all the people that you want to talk to at the same time in it.  To do this, just send SMIRC a create
 		command and tell it what you want your conversation to be called.  Conversation names are under the same restrictions are user nicknames, and therefore
 		must start with a letter (A-Z) and can only contain alphanumeric characters (A-Z and 0-9).  As an example, the command to create a conversation
 		named "Talk" is given below:
@@ -57,7 +57,7 @@
 	<p>
 		You are now in a conversation, but being in a conversation all by yourself doesn't really achieve anything, so next you need to invite the people
 		that you want to participate in the conversation to join you.  To do this, send SMIRC an invite command for each user that you want to invite to
-		participate in the conversation.  As an example, commands are given below to invite Bill, Dave, and Steve to the conversation Talk:
+		participate in the conversation.  As an example, commands are given below to invite Bill, Dave, and Steve to the conversation named "Talk":
 	</p>
 	<code>/INVITE Bill to Talk</code>
 	<code>/INVITE Dave to Talk</code>
@@ -83,6 +83,15 @@
 		then it would appear like this to Bill, Dave, and Steve:
 	</p>
 	<code>Bob@Talk Hello, World!</code>
+	<p>
+		As a shortcut, you only need to prepend the "@[conversation name]" to your message when you are <i>switching</i> conversations.  When SMIRC receives
+		a message for you without a "@[conversation name]" prefix, it simply sends it on to the <i>last</i> conversation that you sent a message to.  Therefore,
+		the below two sets of messages are equivalent:
+	</p>
+	<code>@Talk Hello, World!<br>
+	@Talk Finally, I'm on SMIRC.</code>
+	<code>@Talk Hello, World!<br>
+	Finally, I'm on SMIRC.</code>
 	
 	<h1>SMIRC Command Documentation</h1>
 	{% for i in command_usage_list %}
