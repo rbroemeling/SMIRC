@@ -125,13 +125,13 @@ class SmircCommandCreate(SmircCommand):
 
 	def execute(self):
 		"""Create a new SMIRC conversation.  Executor automatically joins
-		the created conversation and is given operator permissions on it.
+		the created conversation and is given operator permissions in it.
 		
 		/CREATE [conversation name]
 		
 		Example: /CREATE HelloWorld
 		Creates a new SMIRC conversation called "HelloWorld" and automatically
-		joins the executing user to it with operator permissions.
+		joins the executing user to it with full operator permissions.
 		"""
 		try:
 			Conversation.validate_name(self.arguments['conversation_identifier'])
@@ -185,8 +185,8 @@ class SmircCommandInvite(SmircCommand):
 
 		Example: /INVITE Foo to Bar
 		Invites the user "Foo" to the conversation "Bar", assuming that
-		you are a member of a conversation named "Bar" and that you have
-		operator permissions in it.
+		you are in a conversation named "Bar" and that you have operator
+		permissions in it.
 		"""
 		try:
 			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
@@ -200,14 +200,14 @@ class SmircCommandInvite(SmircCommand):
 		except Membership.DoesNotExist:
 			pass
 		else:
-			raise SmircCommandException('user %s is already a member of the conversation named "%s"' % (self.arguments['user'].username, membership.conversation.name))
+			raise SmircCommandException('%s is already a member of the conversation named "%s"' % (self.arguments['user'].username, membership.conversation.name))
 
 		try:
 			Invitation.objects.get(invitee=self.arguments['user'], conversation=membership.conversation)
 		except Invitation.DoesNotExist:
 			pass
 		else:
-			raise SmircCommandException('user %s has already been invited to the conversation named "%s"' % (self.arguments['user'].username, membership.conversation.name))
+			raise SmircCommandException('%s has already been invited to the conversation named "%s"' % (self.arguments['user'].username, membership.conversation.name))
 
 		i = Invitation()
 		i.invitee = self.arguments['user']
@@ -220,56 +220,69 @@ class SmircCommandInvite(SmircCommand):
 		notification.system = True
 		notification.send(self.arguments['user'].get_profile().phone_number)
 
-		return 'user %s has been invited to the conversation named %s' % (self.arguments['user'].username, membership.conversation.name)
+		return '%s has been invited to the conversation named "%s"' % (self.arguments['user'].username, membership.conversation.name)
 
 class SmircCommandJoin(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+in\s+(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self):
-		"""Join a chat conversation that you've been invited to.
+		"""Join a chat conversation that you have been invited to.
 
 		/JOIN [user who invited you] in [conversation you are invited to]
+		
+		Example: /JOIN Foo in Bar
+		Take the user "Foo" up on their invitation and join them in the
+		conversation "Bar".
 		"""
 		try:
 			invitation = Invitation.objects.get(invitee=self.executor, inviter=self.arguments['user'], conversation__name__iexact=self.arguments['conversation_identifier'])
 		except Invitation.DoesNotExist:
-			raise SmircCommandException('you do not have an outstanding invitation from %s to the conversation %s' % (self.arguments['user'].username, self.arguments['conversation_identifier']))
+			raise SmircCommandException('you do not have an outstanding invitation from %s to the conversation "%s"' % (self.arguments['user'].username, self.arguments['conversation_identifier']))
 		
 		try:
 			Membership.load_membership(self.executor, invitation.conversation)
 		except Membership.DoesNotExist:
 			pass
 		else:
-			raise SmircCommandException('you are already in the conversation %s with the user %s', invitation.conversation.name, self.arguments['user'].username)
+			raise SmircCommandException('you are already in the conversation "%s"', invitation.conversation.name)
 
 		try:
 			Membership.load_membership(self.executor, invitation.conversation.name)
 		except Membership.DoesNotExist:
 			pass
 		else:
-			raise SmircCommandException('you are already in a conversation named %s')
+			raise SmircCommandException('you are already in a different conversation named "%s"')
 		
 		m = Membership()
 		m.conversation = invitation.conversation
 		m.user = self.executor
 		m.save()
 		invitation.delete()
-		return 'you have joined the conversation named %s' % (m.conversation.name)
+		return 'you have joined the conversation named "%s"' % (m.conversation.name)
 
 class SmircCommandKick(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<user>\S+)\s+out\s+of\s+(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self):
-		"""Kick a user out of a conversation that you control.
+		"""Kick a user out of a conversation that you have operator
+		permissions in.  Revokes membership in the conversation and/or
+		any outstanding invitations for the user to join the
+		conversation.  Does not prevent further invitations from being
+		issued or the user from joining the conversation in the future.
 
 		/KICK [user to kick] out of [conversation you are an operator of]
+		
+		Example: /KICK Foo out of Bar
+		Removes the user "Foo" from the conversation "Bar", as well as
+		revoking any outstanding invitations for the user "Foo" to join
+		the conversation "Bar".		
 		"""
 		try:
 			executor_membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
 		except Membership.DoesNotExist:
-			raise SmircCommandException('you are not in a conversation named %s' % (self.arguments['conversation_identifier']))
+			raise SmircCommandException('you are not in a conversation named "%s"' % (self.arguments['conversation_identifier']))
 		if not executor_membership.mode_operator:
-			raise SmircCommandException('you are not an operator of the conversation named %s' % (executor_membership.conversation.name))
+			raise SmircCommandException('you are not an operator of the conversation named "%s"' % (executor_membership.conversation.name))
 
 		result = None
 		try:
@@ -277,7 +290,7 @@ class SmircCommandKick(SmircCommand):
 		except Invitation.DoesNotExist:
 			pass
 		else:
-			result = 'user %s has had all invitations to join the conversation %s revoked' % (self.arguments['user'].username, executor_membership.conversation.name)
+			result = '%s has had all invitations to join the conversation "%s" revoked' % (self.arguments['user'].username, executor_membership.conversation.name)
 			invitations.delete()
 
 		try:
@@ -285,13 +298,13 @@ class SmircCommandKick(SmircCommand):
 		except Membership.DoesNotExist:
 			pass
 		else:
-			result = 'user %s has been removed from the conversation %s' % (self.arguments['user'].username, executor_membership.conversation.name)
+			result = '%s has been removed from the conversation "%s"' % (self.arguments['user'].username, executor_membership.conversation.name)
 			membership.delete()
 		
 		if result is not None:
 			return result
 		else:
-			return 'user %s was not a member of the conversation %s' % (self.arguments['user'].username, executor_membership.conversation.name)
+			return '%s was not a member of the conversation "%s"' % (self.arguments['user'].username, executor_membership.conversation.name)
 
 class SmircCommandNick(SmircCommand):
 	ANONYMOUSLY_EXECUTABLE = True
@@ -301,6 +314,9 @@ class SmircCommandNick(SmircCommand):
 		"""Change your user nickname.
 
 		/NICK [new user nickname]
+		
+		Example: /NICK Foo
+		Changes your user nickname to "Foo".
 		"""
 		try:
 			UserProfile.validate_name(self.arguments['new_username'])
@@ -330,9 +346,13 @@ class SmircCommandPart(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self):
-		"""Leave a chat conversation that you're currently in.
+		"""Leave a conversation that you are currently a member of.
 
 		/PART [conversation you are in]
+		
+		Example: /PART Foo
+		Assuming that you are currently a member of a conversation
+		named "Foo", revokes your membership in that conversation.
 		"""
 		try:
 			membership = Membership.load_membership(self.executor, self.arguments['conversation_identifier'])
