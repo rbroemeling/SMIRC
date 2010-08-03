@@ -58,7 +58,7 @@ class MessageSkeleton(models.Model):
 
 	def receive(self, data):
 		self.raw_receive(data)
-		logging.debug('received message "%s" from %s' % (self.raw_body, self.raw_phone_number))
+		logging.debug('received raw SMS message text "%s" from %s' % (self.raw_body, self.raw_phone_number))
 		
 		if not AreaCode.validate_phone_number(self.raw_phone_number):
 			raise SmircOutOfAreaException('disregarding message from outside of SMIRC service area (%s)' % (self.raw_phone_number))
