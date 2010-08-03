@@ -90,6 +90,7 @@ class MessageSkeleton(models.Model):
 			except Membership.DoesNotExist:
 				raise SmircMessageException('you are not involved in a conversation named %s' % (conversation_identifier))
 		else:
+			self.body = self.raw_body
 			try:
 				self.sender = Membership.objects.filter(user__id__exact=user.id).order_by('last_active').reverse()[0]
 			except IndexError:
