@@ -40,13 +40,26 @@ class SmircCommand:
 				yield (name, obj)
 
 	@staticmethod
+	def command_description(klass):
+		description = []
+		if klass.execute.__doc__:
+			for line in klass.execute.__doc__.splitlines():
+				line = line.strip()
+				if line == '':
+					break
+				description.append(line)
+		if length(description) == 0:
+			logging.error('no description defined for command class %s' % (repr(klass)))
+		return description
+
+	@staticmethod
 	def command_usage(klass):
 		if klass.execute.__doc__:
 			for line in klass.execute.__doc__.splitlines():
 				line = line.strip()
 				if line[0:1] == SmircCommand.COMMAND_CHARACTER:
 					return line
-		logging.error('no usage information defined for %s' % (repr(klass)))
+		logging.error('no usage information defined for command class %s' % (repr(klass)))
 		return ''
 
 	def execute(self):

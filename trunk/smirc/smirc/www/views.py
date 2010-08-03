@@ -9,7 +9,7 @@ def help(request):
 	for klassname, obj in SmircCommand.available_commands():
 		command_usage_list.append({
 			'command': klassname.replace('SmircCommand', '').upper(),
-#			'description': SmircCommand.command_description(obj),
+			'description': SmircCommand.command_description(obj).join(' '),
 			'usage': SmircCommand.command_usage(obj)
 		})
 	command_usage_list.sort(key=lambda x: x['command'])
