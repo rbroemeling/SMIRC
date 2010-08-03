@@ -20,7 +20,7 @@ class SmircCommand:
 	def __init__(self, command, arguments):
 		self.command = command
 		if self.ARGUMENTS_REGEX is None:
-			raise SmircCommandException('command %s has not yet been implemented' % (self.command))
+			raise SmircCommandException('command "%s%s" has not yet been implemented' % (SmircCommand.COMMAND_CHARACTER, self.command))
 		match = re.match(self.ARGUMENTS_REGEX, arguments)
 		if match:
 			self.arguments = match.groupdict()
@@ -33,6 +33,7 @@ class SmircCommand:
 				raise SmircCommandException('user %s not found' % (self.arguments['user']))
 			else:
 				self.arguments['user'] = u
+
 	@staticmethod
 	def available_commands():
 		for name, obj in inspect.getmembers(sys.modules[__name__]):
@@ -63,7 +64,7 @@ class SmircCommand:
 		return ''
 
 	def execute(self):
-		raise SmircCommandException('command %s has not yet been implemented' % (self.command))
+		raise SmircCommandException('command "%s%s" has not yet been implemented' % (SmircCommand.COMMAND_CHARACTER, self.command))
 
 	@staticmethod
 	def fetch_command_class(klass_name):
@@ -71,7 +72,7 @@ class SmircCommand:
 			if not re.match('^[A-Za-z]+$', klass_name):
 				raise AttributeError
 			klass_name = klass_name[0:1].upper() + klass_name[1:].lower()
-			klass = getattr(sys.modules[__name__], "SmircCommand%s" % (klass_name))
+			klass = getattr(sys.modules[__name__], 'SmircCommand%s' % (klass_name))
 		except AttributeError as e:
 			raise SmircCommandException('unknown command "%s%s", try "%shelp".' % (SmircCommand.COMMAND_CHARACTER, klass_name.lower(), SmircCommand.COMMAND_CHARACTER))
 		else:
@@ -97,9 +98,16 @@ class SmircCommandCreate(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<conversation_identifier>\S+)\s*$'
 
 	def execute(self):
-		"""Create a new conversation.
+		"""Create a new SMIRC conversation.  Executor automatically joins
+		the created conversation and is given operator permissions on it.
 		
 		/CREATE [conversation name]
+		
+		Example:
+		
+		/CREATE HelloWorld
+		Creates a new SMIRC conversation called "HelloWorld" and automatically
+		joins the executing user to it with operator permissions.
 		"""
 		try:
 			Conversation.validate_name(self.arguments['conversation_identifier'])
@@ -126,8 +134,9 @@ class SmircCommandHelp(SmircCommand):
 	ARGUMENTS_REGEX = '(?P<command>\S+)?\s*$'
 	
 	def execute(self):
-		"""Get help about what commands are available or what the syntax
-		for executing a command is.
+		"""Retrieve a list of available commands (if no argument is
+		given) or retrieve the usage information of a specific command
+		(if a command is given as the argument).
 		
 		/HELP or /HELP [command]
 		"""
