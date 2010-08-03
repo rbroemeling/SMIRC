@@ -111,7 +111,7 @@ class SmircCommand:
 		match = re.match('^([A-Za-z]+)\s*(.*)', s[1:])
 		if match:
 			klass = SmircCommand.fetch_command_class(match.group(1))
-			logging.debug('mapped raw command %s to %s(%s, %s)' % (s, klass, match.group(1).lower(), match.group(2)))
+			logging.debug('mapped raw command "%s" to %s("%s", "%s")' % (s, klass, match.group(1).lower(), match.group(2)))
 			cmd = klass(match.group(1).lower(), match.group(2))
 			if isinstance(u, User) or cmd.ANONYMOUSLY_EXECUTABLE:
 				cmd.executor = u
