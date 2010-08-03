@@ -123,8 +123,9 @@ class SmircCommandHelp(SmircCommand):
 			return SmircCommand.usage(klass)
 		else:
 			commands = []
-			for klassname, obj in SmircCommand.available_commands().sort(key=lambda x: x[0]):
+			for klassname, obj in SmircCommand.available_commands():
 				commands.append(klassname.replace('SmircCommand', '').upper())
+			commands.sort()
 			return 'Commands: %s. Usage: "%sHELP [command]"' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
 	
 class SmircCommandInvite(SmircCommand):
