@@ -1,4 +1,20 @@
 {% extends "page_skeleton.html" %}
 
 {% block content %}
+	<table>
+		<thead>
+			<tr>
+				<th>Command</th>
+				<th>Usage</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for i in command_usage_list %}
+				<tr>
+					<td>{% i.command %}</td>
+					<td>{% i.usage %}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 {% endblock %}

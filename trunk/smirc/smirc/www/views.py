@@ -1,10 +1,22 @@
 from django.shortcuts import render_to_response
+from smirc.command.models import SmircCommand
 
 def faq(request):
 	return render_to_response('pages/faq.html', {})
 
 def help(request):
-	return render_to_response('pages/help.html', {})
+	command_usage_list = []
+	for name, obj in SmircCommand.available_commands():
+		command_usage_list.append({
+			'command': name.replace('SmircCommand', '').upper(),
+			'usage': SmircCommand.usage(obj)
+		})
+	command_usage_list.sort(key=lambda x: x['command'])
+
+	return render_to_response('pages/help.html', {
+		'comchar': SmircCommand.COMMAND_CHARACTER,
+		'command_usage_list': command_usage_list
+	})
 
 def index(request):
 	return render_to_response('pages/index.html', {})
