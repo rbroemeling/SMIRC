@@ -6,6 +6,7 @@ import tempfile
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import models
+from smirc.chat.models import Membership
 from smirc.chat.models import SmircException
 
 class SmircOutOfAreaException(SmircException):
@@ -149,6 +150,5 @@ class SMSToolsMessage(MessageSkeleton):
 
 # We import smirc.* modules at the bottom (instead of at the top) as a fix for
 # circular import problems.
-from smirc.chat.models import Membership
 from smirc.chat.models import UserProfile
 from smirc.command.models import SmircCommand
