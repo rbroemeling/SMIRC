@@ -1,10 +1,38 @@
 {% extends "page_skeleton.html" %}
 
+{% block header %}
+	<style type="text/css">
+		div.command
+		{
+			border: 1px solid;
+			margin: 10px;
+			padding: 5px;
+
+		}
+
+		div.command h1
+		{
+			margin: 0px;
+
+		}
+
+		div.command div.usage
+		{
+
+		}
+
+		div.command div.description
+		{
+
+		}
+	</style>
+{% endblock header %}
+
 {% block content %}
 	{% for i in command_usage_list %}
 		<div class="command">
 			<h1>{{ i.command }}</h1>
-			<div class="usage">{{ i.usage }}</div>
+			<div class="usage">Usage: <code>{{ i.usage }}</code></div>
 			<div class="description">{{ i.description }}</div>
 		</div>
 	{% endfor %}
