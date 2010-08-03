@@ -50,7 +50,7 @@ class SmircCommand:
 			klass_name = klass_name[0:1].upper() + klass_name[1:].lower()
 			klass = getattr(sys.modules[__name__], "SmircCommand%s" % (klass_name))
 		except AttributeError as e:
-			raise SmircCommandException('unknown command "%s", try %shelp' % (klass_name.lower(), SmircCommand.COMMAND_CHARACTER))
+			raise SmircCommandException('unknown command "%s%s", try %shelp' % (SmircCommand.COMMAND_CHARACTER, klass_name.lower(), SmircCommand.COMMAND_CHARACTER))
 		else:
 			return klass
 
