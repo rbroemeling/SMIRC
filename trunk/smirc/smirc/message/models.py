@@ -76,7 +76,7 @@ class MessageSkeleton(models.Model):
 		if self.command:
 			return
 		if user is None:
-			raise SmircMessageException('unknown sender (%s) -- maybe you are not registered? Please use "%sNICK <your nick>" to register or see www.smirc.com for help.' % (self.raw_phone_number, SmircCommand.COMMAND_CHARACTER))
+			raise SmircMessageException('unknown sender %s. Maybe you are not registered? Please see www.smirc.com for help registering.' % (self.raw_phone_number, SmircCommand.COMMAND_CHARACTER))
 
 		conversation_match = re.match('^@(\S*)\s*(.*)', self.raw_body)
 		if conversation_match:
