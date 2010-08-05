@@ -16,6 +16,7 @@ devices = GSM1
 infofile = /var/spool/sms/smsd.running
 logfile = /var/spool/sms/smsd.log
 loglevel = 7
+phonecalls = /tmp
 
 [GSM1]
 device = /dev/ttyUSB0
