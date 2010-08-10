@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('',
 	(r'^$', 'smirc.www.views.index'),     # No arguments, display the main homepage.

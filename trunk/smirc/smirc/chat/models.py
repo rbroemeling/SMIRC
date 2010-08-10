@@ -1,9 +1,7 @@
 import datetime
-import logging
 import re
 from django.contrib.auth.models import User
 from django.db import models
-from django.db.models.signals import post_save
 
 class SmircException(Exception):
 	def __init__(self, value):
@@ -101,7 +99,7 @@ class UserProfile(models.Model):
 	user = models.ForeignKey(User, unique=True)
 
 	def __unicode__(self):
-		return str(phone_number)
+		return str(self.phone_number)
 
 	@staticmethod
 	def load_user(u):

@@ -99,7 +99,7 @@ class SmircCommand:
 				raise AttributeError
 			klass_name = klass_name[0:1].upper() + klass_name[1:].lower()
 			klass = getattr(sys.modules[__name__], 'SmircCommand%s' % (klass_name))
-		except AttributeError as e:
+		except AttributeError:
 			raise SmircCommandException('unknown command "%s%s", try "%shelp".' % (SmircCommand.COMMAND_CHARACTER, klass_name.lower(), SmircCommand.COMMAND_CHARACTER))
 		else:
 			return klass
@@ -170,7 +170,7 @@ class SmircCommandHelp(SmircCommand):
 			return SmircCommand.command_usage(klass)
 		else:
 			commands = []
-			for klassname, obj in SmircCommand.available_commands():
+			for klassname, _unused_obj in SmircCommand.available_commands():
 				commands.append(klassname.replace('SmircCommand', '').upper())
 			commands.sort()
 			return 'Commands: %s. Usage: "%sHELP [command]"' % (string.join(commands, ', '), SmircCommand.COMMAND_CHARACTER)
