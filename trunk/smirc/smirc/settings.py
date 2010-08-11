@@ -1,3 +1,13 @@
+# Decide whether we are running in development or production mode.
+# We are running in development mode if we are running under 'manage.py runserver'.
+import sys
+try:
+	sys.argv.index('runserver')
+	print 'SMIRC settings.py: configuring for development'
+	DEBUG = True
+except ValueError:
+	DEBUG = False
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -13,8 +23,6 @@ ADMINS = (
 #	http://www.b-list.org/weblog/2006/jun/06/django-tips-extending-user-model/
 AUTH_PROFILE_MODULE = 'chat.UserProfile'
 
-DEBUG = True
-
 DATABASES = {
 	'default': {
 		'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
@@ -29,6 +37,9 @@ DATABASES = {
 		}
 	}
 }
+
+EMAIL_HOST = 'localhost'
+EMAIL_SUBJECT_PREFIX = '[SMIRC] '
 
 INSTALLED_APPS = (
 	'django.contrib.auth',
