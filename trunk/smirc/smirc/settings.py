@@ -14,7 +14,7 @@ except ValueError:
 ADMIN_MEDIA_PREFIX = '/media/'
 
 ADMINS = (
-	('Remi Broemeling', 'remi@broemeling.org')
+	('Remi Broemeling', 'remi@broemeling.org'),
 	# ('Your Name', 'your_email@domain.com'),
 )
 
