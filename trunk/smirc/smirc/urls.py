@@ -4,6 +4,9 @@ from django.conf.urls.defaults import include, patterns
 # from django.contrib import admin
 # admin.autodiscover()
 
+handler404 = 'django.views.defaults.page_not_found'
+handler500 = 'django.views.defaults.server_error'
+
 urlpatterns = patterns('',
 	# Route everything else to smirc.www.urls
 	(r'', include('smirc.www.urls'))
