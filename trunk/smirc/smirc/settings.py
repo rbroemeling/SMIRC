@@ -99,6 +99,10 @@ SMSTOOLS = {
 	'outbound_dir': '/var/spool/sms/outgoing'
 }
 
+TEMPLATE_CONTEXT_PROCESSORS = (
+	'django.core.context_processors.request'
+)
+
 TEMPLATE_DEBUG = DEBUG
 
 TEMPLATE_DIRS = (

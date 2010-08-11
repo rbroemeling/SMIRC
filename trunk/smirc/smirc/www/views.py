@@ -1,10 +1,15 @@
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from smirc.command.models import SmircCommand
 
-def faq(_unused_request):
-	return render_to_response('pages/faq.html', {})
+def smirc_render_to_response(request, *args, **kwargs):
+	kwargs['context_instance'] = RequestContext(request)
+	return render_to_response(*args, **kwargs)
 
-def help(_unused_request):
+def faq(request):
+	return smirc_render_to_response(request, 'pages/faq.html', {})
+
+def help(request):
 	command_usage_list = []
 	for klassname, obj in SmircCommand.available_commands():
 		command_usage_list.append({
@@ -15,10 +20,10 @@ def help(_unused_request):
 		})
 	command_usage_list.sort(key=lambda x: x['command'])
 
-	return render_to_response('pages/help.html', {
+	return smirc_render_to_response(request, 'pages/help.html', {
 		'command_character': SmircCommand.COMMAND_CHARACTER,
 		'command_usage_list': command_usage_list
 	})
 
-def index(_unused_request):
-	return render_to_response('pages/index.html', {})
+def index(request):
+	return smirc_render_to_response(request, 'pages/index.html', {})

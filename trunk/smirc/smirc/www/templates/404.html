@@ -1,0 +1,13 @@
+{% extends "page_skeleton.html" %}
+
+{% block title %}Page Not Found{% endblock %}
+
+{% block content %}
+<h1>Not Found</h1>
+
+<div>The requested URL <code>{{ request.path }}</code> was not found on this server.</div>
+
+<hr>
+
+<div><a href="http://www.smirc.com/">SMIRC Homepage</a></div>
+{% endblock %}
