@@ -5,9 +5,9 @@
 {% block content %}
 <h1>Not Found</h1>
 
-<div>The requested URL <code>{{ request.path }}</code> was not found on this server.</div>
+<div>The requested URL <pre style="display: inline;">{{ request.path }}</pre> was not found on this server.</div>
 
-<hr>
+<hr style="margin-bottom: 15px; margin-top: 15px;">
 
-<div><a href="http://www.smirc.com/">SMIRC Homepage</a></div>
+<div style="text-align: center;"><a href="http://www.smirc.com/">SMIRC Homepage</a></div>
 {% endblock %}
