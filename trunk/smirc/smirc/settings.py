@@ -1,11 +1,15 @@
 # Decide whether we are running in development or production mode.
 # We are running in development mode if we are running under 'manage.py runserver'.
+import os
 import sys
 try:
-	sys.argv.index('runserver')
+	if 'SMIRC_ENVIRONMENT' in os.environ and os.environ['SMIRC_ENVIRONMENT'].lower() != 'dev':
+		sys.argv.index('runserver')
 	print 'SMIRC settings.py: configuring for development'
+	os.environ['SMIRC_ENVIRONMENT'] = 'dev'
 	DEBUG = True
 except ValueError:
+	os.environ['SMIRC_ENVIRONMENT'] = 'live'
 	DEBUG = False
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
