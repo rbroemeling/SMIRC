@@ -17,28 +17,30 @@ infofile = /var/spool/sms/smsd.running
 logfile = /var/spool/sms/smsd.log
 loglevel = 7
 phonecalls = /tmp
+report = /var/spool/sms/outgoing/report
 
 [GSM1]
-device = /dev/ttyUSB0
-init = AT+CNMI=0,0,0,1,0
-incoming = yes
 check_memory_method = 31
-phonecalls = clip
-voicecall_hangup_ath = yes
-voicecall_cpas = yes
+device = /dev/ttyUSB0
+incoming = yes
+init = AT+CNMI=0,0,0,1,0
 needs_wakeup_at = yes
-using_routed_status_report = yes
+phonecalls = clip
+report = yes
 routed_status_report_cnma = no
+using_routed_status_report = yes
+voicecall_cpas = yes
+voicecall_hangup_ath = yes
 ___EOF___
 __EOF__
 
-mkdir -p /var/spool/sms /var/spool/sms/checked /var/spool/sms/incoming /var/spool/sms/outgoing
+mkdir -p /var/spool/sms /var/spool/sms/checked /var/spool/sms/incoming /var/spool/sms/incoming/archived /var/spool/sms/outgoing /var/spool/sms/outgoing/report
 addgroup --system sms
 adduser --system --home /var/spool/sms --no-create-home --ingroup sms --disabled-password smsd
 addgroup smsd dialout
 chown -R smsd.sms /var/spool/sms
-chmod 0755 /var/spool/sms /var/spool/sms/checked
-chmod 0775 /var/spool/sms/incoming /var/spool/sms/outgoing
+chmod 0755 /var/spool/sms /var/spool/sms/checked /var/spool/sms/outgoing/report
+chmod 0775 /var/spool/sms/incoming /var/spool/sms/incoming/archived /var/spool/sms/outgoing
 cat <<'__EOF__'
 
 ------------------------------------------------------------------------------------------
