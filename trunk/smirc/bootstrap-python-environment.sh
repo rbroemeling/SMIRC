@@ -37,7 +37,10 @@ sudo -u pythonbin rm -r "MySQL-python-1.2.3" "MySQL-python-1.2.3.tar.gz"
 # Install Django.
 sudo -u pythonbin "${PYTHON_ENVIRONMENT_PATH}/bin/easy_install" --prefix="${PYTHON_ENVIRONMENT_PATH}" django
 
-# Install Pyinotify.
+# Install flup, required by Django to run over FastCGI.
+sudo -u pythonbin "${PYTHON_ENVIRONMENT_PATH}/bin/easy_install" --prefix="${PYTHON_ENVIRONMENT_PATH}" flup
+
+# Install Pyinotify, required by smircd to monitor the incoming SMS directory for new messages.
 sudo -u pythonbin "${PYTHON_ENVIRONMENT_PATH}/bin/easy_install" --prefix="${PYTHON_ENVIRONMENT_PATH}" pyinotify
 
 # Ensure that our stow links are up-to-date.
