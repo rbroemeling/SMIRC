@@ -97,6 +97,9 @@ SECRET_KEY = '_b!mf0hketu4xt(l-j+ilw75*bh&xqt#25!v1(8rmv@l3q81wo'
 
 SITE_ID = 1
 
+# SMIRC's phone number.
+SMIRC_PHONE_NUMBER = '17807291450'
+
 # Configuration for smstools sms inbound/outbound directories.
 SMSTOOLS = {
 	'inbound_dir': '/var/spool/sms/incoming',

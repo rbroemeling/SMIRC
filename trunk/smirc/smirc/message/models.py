@@ -139,12 +139,14 @@ class SMSToolsMessage(MessageSkeleton):
 
 	def raw_send(self, phone_number, message):
 		tempfile.tempdir = settings.SMSTOOLS['outbound_dir']
-		(fd, path) = tempfile.mkstemp('suffix', 'prefix', None, True)
+		(fd, path) = tempfile.mkstemp('.smircd', '%s-' % (phone_number), None, True)
 		os.fchmod(fd, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP)
 		f = os.fdopen(fd, 'w')
-		f.write('To: %s\n' % (phone_number))
-		f.write('\n')
-		f.write('%s\n' % (message))
+		f.write('Alphabet: ISO\n'.decode('latin-1'))
+		f.write(('From: %s\n' % (settings.SMIRC_PHONE_NUMBER)).decode('latin-1'))
+		f.write(('To: %s\n' % (phone_number)).decode('latin-1'))
+		f.write('\n'.decode('latin-1'))
+		f.write(('%s\n' % (message)).decode('latin-1'))
 		f.close()
 		return path
 
