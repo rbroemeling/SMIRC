@@ -133,7 +133,7 @@ if __name__ == '__main__':
 	watch_manager = pyinotify.WatchManager()
 	sms_file_handler = SMSFileHandler()
 	notifier = pyinotify.Notifier(watch_manager, sms_file_handler)
-	watch_manager.add_watch(settings.SMSTOOLS['inbound_dir'], pyinotify.IN_MODIFY)
+	watch_manager.add_watch(settings.SMSTOOLS['inbound_dir'], pyinotify.EventsCodes.FLAG_COLLECTIONS['OP_FLAGS']['IN_MODIFY'])
 	
 	# TODO: deal with pre-existing files (i.e. files that have already been received and
 	# are sitting on our inbound directory right now.
