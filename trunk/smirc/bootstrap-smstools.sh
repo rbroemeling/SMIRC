@@ -13,6 +13,7 @@ sudo -u nobody make install BINDIR="${STOW_DIR}/bin"
 sudo -u nobody mkdir "${STOW_DIR}/etc" 
 cat >"${STOW_DIR}/etc/smsd.conf" <<___EOF___
 devices = GSM1
+failed = /var/spool/sms/outgoing/failed
 infofile = /var/spool/sms/smsd.running
 logfile = /var/spool/sms/smsd.log
 loglevel = 7
@@ -34,12 +35,12 @@ voicecall_hangup_ath = yes
 ___EOF___
 __EOF__
 
-mkdir -p /var/spool/sms /var/spool/sms/checked /var/spool/sms/incoming /var/spool/sms/incoming/archived /var/spool/sms/outgoing /var/spool/sms/outgoing/report
+mkdir -p /var/spool/sms /var/spool/sms/checked /var/spool/sms/incoming /var/spool/sms/incoming/archived /var/spool/sms/outgoing /var/spool/sms/outgoing/failed /var/spool/sms/outgoing/report
 addgroup --system sms
 adduser --system --home /var/spool/sms --no-create-home --ingroup sms --disabled-password smsd
 addgroup smsd dialout
 chown -R smsd.sms /var/spool/sms
-chmod 0755 /var/spool/sms /var/spool/sms/checked /var/spool/sms/outgoing/report
+chmod 0755 /var/spool/sms /var/spool/sms/checked /var/spool/sms/outgoing/report /var/spool/sms/outgoing/failed
 chmod 0775 /var/spool/sms/incoming /var/spool/sms/incoming/archived /var/spool/sms/outgoing
 cat <<'__EOF__'
 
