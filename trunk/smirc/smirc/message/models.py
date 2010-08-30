@@ -1,3 +1,4 @@
+import codecs
 import logging
 import os
 import re
@@ -116,7 +117,7 @@ class SMSToolsMessage(MessageSkeleton):
 	def raw_receive(self, location):
 		body = None
 		headers = {}
-		with open(location, 'r') as f:
+		with codecs.open(location, encoding='latin-1', mode='r') as f:
 			for line in f:
 				if not body is None:
 					body += line
