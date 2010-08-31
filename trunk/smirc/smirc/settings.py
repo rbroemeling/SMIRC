@@ -81,6 +81,7 @@ if DEBUG:
 	loglevel = logging.DEBUG
 logging.basicConfig(datefmt = '%d %b %Y %H:%M:%S', format = '%(asctime)s %(levelname)-8s %(message)s', level = loglevel)
 del loglevel
+logging.info('configuring SMIRC for %s environment' % (os.environ['SMIRC_ENVIRONMENT'].lower()))
 
 MANAGERS = ADMINS
 
