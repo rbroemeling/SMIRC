@@ -47,10 +47,9 @@ sudo -u pythonbin "${PYTHON_ENVIRONMENT_PATH}/bin/easy_install" --prefix="${PYTH
 sudo -u pythonbin "${PYTHON_ENVIRONMENT_PATH}/bin/easy_install" --prefix="${PYTHON_ENVIRONMENT_PATH}" pyyaml
 
 # Install Django/Hoptoad integration.
-sudo -u pythonbin git clone git://github.com/sjl/django-hoptoad.git
-cd django-hoptoad
-sudo -u pythonbin python /usr/local/bin/python setup.py install --prefix="${PYTHON_ENVIRONMENT_PATH}"
-cd ..
+sudo -u pythonbin git clone http://github.com/mahmoudimus/django-hoptoad.git
+find django-hoptoad/hoptoad -type f -print0 | sudo -u pythonbin xargs --null chmod 0644
+sudo -u pythonbin cp -a django-hoptoad/hoptoad "${PYTHON_ENVIRONMENT_PATH}"/lib/python*/site-packages/
 sudo -u pythonbin rm -r django-hoptoad
 
 # Ensure that our stow links are up-to-date.
