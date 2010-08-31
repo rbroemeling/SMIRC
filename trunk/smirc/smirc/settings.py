@@ -68,15 +68,31 @@ INSTALLED_APPS = (
 LANGUAGE_CODE = 'en-us'
 
 # Configure Python's logging module for use throughout smirc.  Use an attribute on the
-# logging module to work-around the fact that settings.py can be (and is) executed multiple
-# times, but we really only want to carry out our logging initialization once.
+# logging module to work-around the fact that settings.py can be (and sometimes is) executed
+# multiple times, but we really only want to carry out our logging initialization once.
 import logging
+import logging.handlers
 if not getattr(logging.getLogger(), 'smirc_logging_initialized', False):
-	loglevel = logging.INFO
+	date_format = '%d/%b/%Y %H:%M:%S'
+	log_format = '%(asctime)s %(levelname)-8s %(process)-5d [%(pathname)s:%(lineno)d] %(message)s'
+
+	# Initialize a basic (stderr) logger, with a log-level based on our DEBUG constant.
+	log_level = logging.INFO
 	if DEBUG:
-		loglevel = logging.DEBUG
-	logging.basicConfig(datefmt = '%d/%b/%Y %H:%M:%S', format = '%(asctime)s %(levelname)-8s %(process)-5d [%(pathname)s:%(lineno)d] %(message)s', level = loglevel)
-	del loglevel
+		log_level = logging.DEBUG
+	logging.basicConfig(level = log_level, format = log_format, datefmt = date_format)
+	del log_level
+
+	# Keep a rotating log-file on-hand (up to 1MB in size), as well as the most recent 8
+	# expired log files.
+	log_file = '/var/log/smirc/smirc-%s.log' % (os.environ['SMIRC_ENVIRONMENT'].lower())
+	fh = logging.handlers.RotatingFileHandler(log_file, 'a', (1024 * 1024), 8)
+	fh.setFormatter(logging.Formatter(log_format, date_format))
+	logging.getLogger('').addHandler(fh)
+	del log_file
+
+	del log_format
+	del date_format
 	logging.info('configuring SMIRC for %s environment' % (os.environ['SMIRC_ENVIRONMENT'].lower()))
 	setattr(logging.getLogger(), 'smirc_logging_initialized', True)
 
