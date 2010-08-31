@@ -1,16 +1,20 @@
-# Decide whether we are running in development or production mode.
-# We are running in development mode if we are running under 'manage.py runserver'.
+# Determine whether we are running in development or production mode.
 import os
 import sys
-try:
-	if 'SMIRC_ENVIRONMENT' in os.environ and os.environ['SMIRC_ENVIRONMENT'].lower() != 'dev':
-		sys.argv.index('runserver')
-	print 'SMIRC settings.py: configuring for development'
-	os.environ['SMIRC_ENVIRONMENT'] = 'dev'
+
+# Default to the production environment.
+DEBUG = False
+if 'SMIRC_ENVIRONMENT' in os.environ and os.environ['SMIRC_ENVIRONMENT'].lower()[:3] == 'dev':
+	# We have been explicitly told to go to development mode via the environment variable SMIRC_ENVIRONMENT.
 	DEBUG = True
-except ValueError:
-	os.environ['SMIRC_ENVIRONMENT'] = 'live'
-	DEBUG = False
+if 'runserver' in sys.argv:
+	# We are implicitly in development mode because we are running under 'manage.py runserver'.
+	DEBUG = True
+
+if DEBUG:
+	os.environ['SMIRC_ENVIRONMENT'] = 'Development'
+else:
+	os.environ['SMIRC_ENVIRONMENT'] = 'Production'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -47,7 +51,7 @@ EMAIL_SUBJECT_PREFIX = '[SMIRC] '
 
 HOPTOAD_SETTINGS = {
 	'HOPTOAD_API_KEY': 'c54f26217c7738ccf7ece2f3f807b98dc2e677b3',
-	'HOPTOAD_ENV_NAME': 'Development' if DEBUG else 'Production',
+	'HOPTOAD_ENV_NAME': os.environ['SMIRC_ENVIRONMENT'],
 	'HOPTOAD_NOTIFY_WHILE_DEBUG': True,
 	'HOPTOAD_THREAD_COUNT': 1,
 }
