@@ -45,6 +45,13 @@ DATABASES = {
 EMAIL_HOST = 'localhost'
 EMAIL_SUBJECT_PREFIX = '[SMIRC] '
 
+HOPTOAD_SETTINGS = {
+	'HOPTOAD_API_KEY': 'c54f26217c7738ccf7ece2f3f807b98dc2e677b3',
+	'HOPTOAD_ENV_NAME': 'Development' if DEBUG else 'Production',
+	'HOPTOAD_NOTIFY_WHILE_DEBUG': True,
+	'HOPTOAD_THREAD_COUNT': 1,
+}
+
 INSTALLED_APPS = (
 	'django.contrib.auth',
 	'django.contrib.contenttypes',
@@ -88,6 +95,7 @@ MIDDLEWARE_CLASSES = (
 	'django.middleware.csrf.CsrfViewMiddleware',
 	'django.contrib.auth.middleware.AuthenticationMiddleware',
 	'django.contrib.messages.middleware.MessageMiddleware',
+	'hoptoad.middleware.HoptoadNotifierMiddleware',
 )
 
 ROOT_URLCONF = 'smirc.urls'
