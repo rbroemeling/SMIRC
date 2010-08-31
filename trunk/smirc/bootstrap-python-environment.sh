@@ -43,15 +43,6 @@ sudo -u pythonbin "${PYTHON_ENVIRONMENT_PATH}/bin/easy_install" --prefix="${PYTH
 # Install Pyinotify, required by smircd to monitor the incoming SMS directory for new messages.
 sudo -u pythonbin "${PYTHON_ENVIRONMENT_PATH}/bin/easy_install" --prefix="${PYTHON_ENVIRONMENT_PATH}" pyinotify
 
-# Install pyyaml, required by django-hoptoad.
-sudo -u pythonbin "${PYTHON_ENVIRONMENT_PATH}/bin/easy_install" --prefix="${PYTHON_ENVIRONMENT_PATH}" pyyaml
-
-# Install Django/Hoptoad integration.
-sudo -u pythonbin git clone http://github.com/mahmoudimus/django-hoptoad.git
-find django-hoptoad/hoptoad -type f -print0 | sudo -u pythonbin xargs --null chmod 0644
-sudo -u pythonbin cp -a django-hoptoad/hoptoad "${PYTHON_ENVIRONMENT_PATH}"/lib/python*/site-packages/
-sudo -u pythonbin rm -r django-hoptoad
-
 # Ensure that our stow links are up-to-date.
 cd /usr/local/stow
 stow -v "${PYTHON_ENVIRONMENT_PATH##*/}"
