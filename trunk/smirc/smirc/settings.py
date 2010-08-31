@@ -67,14 +67,18 @@ INSTALLED_APPS = (
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'en-us'
 
-# Configure Python's logging module for use throughout smirc.
+# Configure Python's logging module for use throughout smirc.  Use an attribute on the
+# logging module to work-around the fact that settings.py can be (and is) executed multiple
+# times, but we really only want to carry out our logging initialization once.
 import logging
-loglevel = logging.INFO
-if DEBUG:
-	loglevel = logging.DEBUG
-logging.basicConfig(datefmt = '%d %b %Y %H:%M:%S', format = '%(asctime)s %(levelname)-8s %(message)s', level = loglevel)
-del loglevel
-logging.info('configuring SMIRC for %s environment' % (os.environ['SMIRC_ENVIRONMENT'].lower()))
+if not getattr(logging.getLogger(), 'smirc_logging_initialized', False):
+	loglevel = logging.INFO
+	if DEBUG:
+		loglevel = logging.DEBUG
+	logging.basicConfig(datefmt = '%d/%b/%Y %H:%M:%S', format = '%(asctime)s %(levelname)-8s %(process)-5d [%(pathname)s:%(lineno)d] %(message)s', level = loglevel)
+	del loglevel
+	logging.info('configuring SMIRC for %s environment' % (os.environ['SMIRC_ENVIRONMENT'].lower()))
+	setattr(logging.getLogger(), 'smirc_logging_initialized', True)
 
 MANAGERS = ADMINS
 
