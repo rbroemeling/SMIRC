@@ -16,6 +16,13 @@ if DEBUG:
 else:
 	os.environ['SMIRC_ENVIRONMENT'] = 'Production'
 
+# Determine whether we are running as part of smircd.py (SMIRC SMS daemon) or part of the
+# SMIRC website (SMIRC WWW).
+if (os.path.basename(sys.argv[0]) == 'smircd.py'):
+	os.environ['SMIRC_AREA'] = 'Daemon'
+else:
+	os.environ['SMIRC_AREA'] = 'WWW'
+
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
 # Examples: "http://foo.com/media/", "/media/".
@@ -86,7 +93,7 @@ if not getattr(logging.getLogger(), 'smirc_logging_initialized', False):
 	# Also duplicate logging information to syslog via /dev/log, on facility LOG_LOCAL0.  Note
 	# that our logging format is different, as syslog implicitly includes a timestamp.
 	sh = logging.handlers.SysLogHandler('/dev/log', 'local0')
-	sh.setFormatter(logging.Formatter('%(levelname)s <' + os.environ['SMIRC_ENVIRONMENT'] + ', PID %(process)d> [%(pathname)s:%(lineno)d] %(message)s'))
+	sh.setFormatter(logging.Formatter('%(levelname)s <' + os.environ['SMIRC_AREA'] + ':' + os.environ['SMIRC_ENVIRONMENT'] + ', PID %(process)d> [%(pathname)s:%(lineno)d] %(message)s'))
 	logging.getLogger('').addHandler(sh)
 
 	logging.info('configuring SMIRC for %s environment' % (os.environ['SMIRC_ENVIRONMENT'].lower()))
