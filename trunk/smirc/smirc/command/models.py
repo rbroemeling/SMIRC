@@ -6,6 +6,8 @@ import sys
 from django.contrib.auth.models import User
 from smirc.chat.models import SmircException
 
+logger = logging.getLogger(__name__)
+
 class SmircCommandException(SmircException):
 	pass
 
@@ -52,7 +54,7 @@ class SmircCommand:
 					description = description + ' '
 				description = description + line
 		if len(description) == 0:
-			logging.error('no description defined for command class %s' % (repr(klass)))
+			logger.error('no description defined for command class %s' % (repr(klass)))
 		return description
 
 	@staticmethod
@@ -86,7 +88,7 @@ class SmircCommand:
 				line = line.strip()
 				if line[0:1] == SmircCommand.COMMAND_CHARACTER:
 					return line
-		logging.error('no usage information defined for command class %s' % (repr(klass)))
+		logger.error('no usage information defined for command class %s' % (repr(klass)))
 		return ''
 
 	def execute(self):
@@ -111,7 +113,7 @@ class SmircCommand:
 		match = re.match('^([A-Za-z]+)\s*(.*)', s[1:])
 		if match:
 			klass = SmircCommand.fetch_command_class(match.group(1))
-			logging.debug('mapped raw command "%s" to %s("%s", "%s")' % (s, klass, match.group(1).lower(), match.group(2)))
+			logger.debug('mapped raw command "%s" to %s("%s", "%s")' % (s, klass, match.group(1).lower(), match.group(2)))
 			cmd = klass(match.group(1).lower(), match.group(2))
 			if isinstance(u, User) or cmd.ANONYMOUSLY_EXECUTABLE:
 				cmd.executor = u

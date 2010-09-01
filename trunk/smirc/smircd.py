@@ -31,10 +31,11 @@ from smirc.message.models import SmircRawMessageException
 from smirc.message.models import SMSToolsMessage
 
 __version__ = '$Rev$'
+logger = logging.getLogger('smircd.py')
 
 class SMSFileHandler(pyinotify.ProcessEvent):
 	def process_IN_MODIFY(self, event):
-		logging.debug('event IN_MODIFY occurred for %s' % event.pathname)
+		logger.debug('event IN_MODIFY occurred for %s' % event.pathname)
 		message = SMSToolsMessage()
 		response = None
 		try:
@@ -44,11 +45,11 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 			response.body = str(e)
 			response.system = True
 		except SmircOutOfAreaException as e:
-			logging.warning('message out of area exception: %s' % (str(e)))
+			logger.warning('message out of area exception: %s' % (str(e)))
 		except SmircRawMessageException as e:
-			logging.error('raw message exception occurred while receiving messages %s: %s' % (event.pathname, e))
+			logger.error('raw message exception occurred while receiving messages %s: %s' % (event.pathname, e))
 		except Exception as e:
-			logging.exception('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
+			logger.exception('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
 
 			subject = 'unhandled exception occurred while receiving message %s' % (event.pathname)
 			message = '\n'.join(traceback.format_exception(*(sys.exc_info())))
@@ -74,7 +75,7 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 			try:
 				response.send(message.raw_phone_number)
 			except Exception as e:
-				logging.exception('unhandled exception occurred while sending message to %s: %s' % (message.raw_phone_number, e))
+				logger.exception('unhandled exception occurred while sending message to %s: %s' % (message.raw_phone_number, e))
 
 def signal_handler(signum, _unused_frame):
 	global smircd_terminate
@@ -85,38 +86,38 @@ def signal_handler(signum, _unused_frame):
 			sigdesc = member[0]
 			break
 	if signum in [ signal.SIGINT, signal.SIGTERM, signal.SIGQUIT ]:
-		logging.info('signal_handler received signal %s(%d), setting termination flag' % (sigdesc, signum))
+		logger.info('signal_handler received signal %s(%d), setting termination flag' % (sigdesc, signum))
 		smircd_terminate = True
 	elif signum in [ signal.SIGHUP ]:
-		logging.warning('signal_handler ignoring signal %s(%d)' % (sigdesc, signum))
+		logger.warning('signal_handler ignoring signal %s(%d)' % (sigdesc, signum))
 	else:
-		logging.error('signal_handler ignoring unhandled signal %s(%d)' % (sigdesc, signum))
+		logger.error('signal_handler ignoring unhandled signal %s(%d)' % (sigdesc, signum))
 
 def smircd_sanity_check():
 	errors = 0
 
 	if not os.path.exists(settings.SMSTOOLS['inbound_dir']):
-		logging.error('inbound directory %s does not exist' % (settings.SMSTOOLS['inbound_dir']))
+		logger.error('inbound directory %s does not exist' % (settings.SMSTOOLS['inbound_dir']))
 		errors += 1
 	else:
 		if not os.path.isdir(settings.SMSTOOLS['inbound_dir']):
-			logging.error('inbound directory %s is not a directory' % (settings.SMSTOOLS['inbound_dir']))
+			logger.error('inbound directory %s is not a directory' % (settings.SMSTOOLS['inbound_dir']))
 			errors += 1
 		else:
 			if not os.access(settings.SMSTOOLS['inbound_dir'], os.R_OK):
-				logging.error('inbound directory %s is not readable' % (settings.SMSTOOLS['inbound_dir']))
+				logger.error('inbound directory %s is not readable' % (settings.SMSTOOLS['inbound_dir']))
 				errors += 1
 
 	if not os.path.exists(settings.SMSTOOLS['outbound_dir']):
-		logging.error('outbound directory %s does not exist' % (settings.SMSTOOLS['outbound_dir']))
+		logger.error('outbound directory %s does not exist' % (settings.SMSTOOLS['outbound_dir']))
 		errors += 1
 	else:
 		if not os.path.isdir(settings.SMSTOOLS['outbound_dir']):
-			logging.error('outbound directory %s is not a directory' % (settings.SMSTOOLS['outbound_dir']))
+			logger.error('outbound directory %s is not a directory' % (settings.SMSTOOLS['outbound_dir']))
 			errors += 1
 		else:
 			if not os.access(settings.SMSTOOLS['outbound_dir'], os.W_OK):
-				logging.error('outbound directory %s is not writable' % (settings.SMSTOOLS['outbound_dir']))
+				logger.error('outbound directory %s is not writable' % (settings.SMSTOOLS['outbound_dir']))
 				errors += 1
 
 	if errors > 0:
@@ -125,7 +126,7 @@ def smircd_sanity_check():
 smircd_terminate = False
 
 if __name__ == '__main__':
-	logging.debug('settings.SMSTOOLS: %s', str(settings.SMSTOOLS))
+	logger.debug('settings.SMSTOOLS: %s', str(settings.SMSTOOLS))
 	smircd_sanity_check()
 
 	if not os.path.exists('%s/archived' % (settings.SMSTOOLS['inbound_dir'])):
