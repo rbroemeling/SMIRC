@@ -10,6 +10,8 @@ from django.db import models
 from smirc.chat.models import Membership
 from smirc.chat.models import SmircException
 
+logger = logging.getLogger(__name__)
+
 class SmircOutOfAreaException(SmircException):
 	pass
 
@@ -35,14 +37,14 @@ class AreaCode(models.Model):
 			country_code = s[0]
 			area_code = s[1:4]
 		except IndexError:
-			logging.warning('invalid phone number failed validation: %s' % (s))
+			logger.warning('invalid phone number failed validation: %s' % (s))
 			pass
 		else:
 			try:
 				AreaCode.objects.get(area_code__exact=area_code, country_code__exact=country_code)
 				return True
 			except AreaCode.DoesNotExist:
-				logging.warning('phone number %s failed validation due to unknown country code (%s) or area code (%s)' % (s, country_code, area_code))
+				logger.warning('phone number %s failed validation due to unknown country code (%s) or area code (%s)' % (s, country_code, area_code))
 				pass
 		return False
 
@@ -56,7 +58,7 @@ class MessageSkeleton(models.Model):
 
 	def receive(self, data):
 		self.raw_receive(data)
-		logging.debug('received raw SMS message text "%s" from %s' % (self.raw_body, self.raw_phone_number))
+		logger.debug('received raw SMS message text "%s" from %s' % (self.raw_body, self.raw_phone_number))
 		
 		if not AreaCode.validate_phone_number(self.raw_phone_number):
 			raise SmircOutOfAreaException('disregarding message from outside of SMIRC service area (%s)' % (self.raw_phone_number))
@@ -93,7 +95,7 @@ class MessageSkeleton(models.Model):
 				self.sender = Membership.objects.filter(user__id__exact=user.id).order_by('last_active').reverse()[0]
 			except IndexError:
 				raise SmircMessageException('you did not target a conversation, and you have no last-active (default) conversation')
-		logging.debug('message body = "%s", target conversation = "%s" (id:%d), sender = "%s" (id:%d)' % (self.body, self.sender.conversation.name, self.sender.conversation.id, self.sender.user.username, self.sender.user.id))
+		logger.debug('message body = "%s", target conversation = "%s" (id:%d), sender = "%s" (id:%d)' % (self.body, self.sender.conversation.name, self.sender.conversation.id, self.sender.user.username, self.sender.user.id))
 		
 	def send(self, phone_number):
 		if self.body is None:
@@ -110,7 +112,7 @@ class MessageSkeleton(models.Model):
 			message = '%s: %s' % (str(self.sender), self.body)
 
 		message = message[:140]
-		logging.debug('sending message "%s" to %s' % (message, phone_number))
+		logger.debug('sending message "%s" to %s' % (message, phone_number))
 		return self.raw_send(phone_number, message)
 
 class SMSToolsMessage(MessageSkeleton):
@@ -129,7 +131,7 @@ class SMSToolsMessage(MessageSkeleton):
 							value = value.strip()
 							headers[key] = value
 						except ValueError:
-							logging.warn('skipping invalid header: "%s"' % (line))
+							logger.warn('skipping invalid header: "%s"' % (line))
 					else:
 						body = ''
 		self.raw_body = body
