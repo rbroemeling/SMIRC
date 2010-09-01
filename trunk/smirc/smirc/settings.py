@@ -73,26 +73,22 @@ LANGUAGE_CODE = 'en-us'
 import logging
 import logging.handlers
 if not getattr(logging.getLogger(), 'smirc_logging_initialized', False):
-	date_format = '%d/%b/%Y %H:%M:%S'
-	log_format = '%(asctime)s %(levelname)-8s %(process)-5d [%(pathname)s:%(lineno)d] %(message)s'
-
 	# Initialize a basic (stderr) logger, with a log-level based on our DEBUG constant.
 	log_level = logging.INFO
 	if DEBUG:
 		log_level = logging.DEBUG
-	logging.basicConfig(level = log_level, format = log_format, datefmt = date_format)
+	logging.basicConfig(
+		level = log_level,
+		format = '%(asctime)s %(levelname)-8s %(process)-5d [%(pathname)s:%(lineno)d] %(message)s',
+		datefmt = '%d/%b/%Y %H:%M:%S')
 	del log_level
 
-	# Keep a rotating log-file on-hand (up to 1MB in size), as well as the most recent 8
-	# expired log files.
-	log_file = '/var/log/smirc/smirc-%s.log' % (os.environ['SMIRC_ENVIRONMENT'].lower())
-	fh = logging.handlers.RotatingFileHandler(log_file, 'a', (1024 * 1024), 8)
-	fh.setFormatter(logging.Formatter(log_format, date_format))
-	logging.getLogger('').addHandler(fh)
-	del log_file
+	# Also duplicate logging information to syslog via /dev/log, on facility LOG_LOCAL0.  Note
+	# that our logging format is different, as syslog implicitly includes a timestamp.
+	sh = logging.handlers.SysLogHandler('/dev/log', 'local0')
+	sh.setFormatter(logging.Formatter('%(levelname)s <' + os.environ['SMIRC_ENVIRONMENT'] + ', PID %(process)d> [%(pathname)s:%(lineno)d] %(message)s'))
+	logging.getLogger('').addHandler(sh)
 
-	del log_format
-	del date_format
 	logging.info('configuring SMIRC for %s environment' % (os.environ['SMIRC_ENVIRONMENT'].lower()))
 	setattr(logging.getLogger(), 'smirc_logging_initialized', True)
 
