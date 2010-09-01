@@ -20,7 +20,9 @@ import os
 import pyinotify
 import signal
 import sys
+import traceback
 from django.conf import settings
+from django.core.mail import mail_admins
 from smirc.chat.models import Membership
 from smirc.command.models import SmircCommandException
 from smirc.message.models import SmircMessageException
@@ -47,6 +49,10 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 			logging.error('raw message exception occurred while receiving messages %s: %s' % (event.pathname, e))
 		except Exception as e:
 			logging.exception('unhandled exception occurred while receiving message %s: %s' % (event.pathname, e))
+
+			subject = 'unhandled exception occurred while receiving message %s' % (event.pathname)
+			message = '\n'.join(traceback.format_exception(*(sys.exc_info())))
+			mail_admins(subject, message, fail_silently=True)
 		else:
 			if (message.command):
 				response = SMSToolsMessage()
