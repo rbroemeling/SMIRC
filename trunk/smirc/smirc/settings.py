@@ -79,7 +79,7 @@ LANGUAGE_CODE = 'en-us'
 # multiple times, but we really only want to carry out our logging initialization once.
 import logging
 import logging.handlers
-if not getattr(logging.getLogger(), 'smirc_logging_initialized', False):
+if not getattr(logging.getLogger(''), 'smirc_logging_initialized', False):
 	# Initialize a basic (stderr) logger, with a log-level based on our DEBUG constant.
 	log_level = logging.INFO
 	if DEBUG:
@@ -97,7 +97,7 @@ if not getattr(logging.getLogger(), 'smirc_logging_initialized', False):
 	logging.getLogger('').addHandler(sh)
 
 	logging.info('configuring SMIRC for %s environment' % (os.environ['SMIRC_ENVIRONMENT'].lower()))
-	setattr(logging.getLogger(), 'smirc_logging_initialized', True)
+	setattr(logging.getLogger(''), 'smirc_logging_initialized', True)
 
 MANAGERS = ADMINS
 
