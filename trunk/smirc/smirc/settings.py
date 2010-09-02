@@ -78,7 +78,7 @@ LANGUAGE_CODE = 'en-us'
 # logging module to work-around the fact that settings.py can be (and sometimes is) executed
 # multiple times, but we really only want to carry out our logging initialization once.
 import logging
-import logging.handlers
+from remiutilities import UTFFixedSysLogHandler
 if not getattr(logging.getLogger(''), 'smirc_logging_initialized', False):
 	# Initialize a basic (stderr) logger, with a log-level based on our DEBUG constant.
 	log_level = logging.INFO
@@ -92,7 +92,7 @@ if not getattr(logging.getLogger(''), 'smirc_logging_initialized', False):
 
 	# Also duplicate logging information to syslog via /dev/log, on facility LOG_LOCAL0.  Note
 	# that our logging format is different, as syslog implicitly includes a timestamp.
-	sh = logging.handlers.SysLogHandler('/dev/log', 'local0')
+	sh = UTFFixedSysLogHandler('/dev/log', 'local0')
 	sh.setFormatter(logging.Formatter('%(levelname)s <' + os.environ['SMIRC_AREA'] + ':' + os.environ['SMIRC_ENVIRONMENT'] + ', PID %(process)d> [%(pathname)s:%(lineno)d] %(message)s'))
 	logging.getLogger('').addHandler(sh)
 
