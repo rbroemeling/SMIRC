@@ -145,11 +145,13 @@ class SMSToolsMessage(MessageSkeleton):
 		(fd, path) = tempfile.mkstemp('.smircd', '%s-' % (phone_number), None, True)
 		os.fchmod(fd, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP)
 		f = os.fdopen(fd, 'w')
-		f.write('Alphabet: ISO\n'.decode('latin-1'))
-		f.write(('From: %s\n' % (settings.SMIRC_PHONE_NUMBER)).decode('latin-1'))
-		f.write(('To: %s\n' % (phone_number)).decode('latin-1'))
-		f.write('\n'.decode('latin-1'))
-		f.write(('%s\n' % (message)).decode('latin-1'))
+		f.write('Alphabet: UCS2\n'.encode('latin-1'))
+		f.write(('From: %s\n' % (settings.SMIRC_PHONE_NUMBER)).encode('latin-1'))
+		f.write(('To: %s\n' % (phone_number)).encode('latin-1'))
+		f.write('\n'.encode('latin-1'))
+		# Note that UCS-2 is obsolete.  We assume that UCS-2 == UTF-16,
+		# which should work properly at least the grand majority of the time.
+		f.write(('%s\n' % (message)).encode('utf-16'))
 		f.close()
 		return path
 
