@@ -1,4 +1,3 @@
-import codecs
 import logging
 import os
 import re
@@ -119,7 +118,7 @@ class SMSToolsMessage(MessageSkeleton):
 	def raw_receive(self, location):
 		body = None
 		headers = {}
-		with codecs.open(location, encoding='latin-1', mode='r') as f:
+		with open(location, 'r') as f:
 			for line in f:
 				if not body is None:
 					body += line
@@ -134,24 +133,41 @@ class SMSToolsMessage(MessageSkeleton):
 							logger.warn('skipping invalid header: "%s"' % (line))
 					else:
 						body = ''
-		self.raw_body = body
+		if headers.has_key('alphabet'):
+			if headers['alphabet'] == 'ISO' or headers['alphabet'] == 'Latin' or headers['alphabet'] == 'Ansi':
+				self.raw_body = body.decode('latin-1')
+			elif headers['alphabet'] == 'UCS' or headers['alphabet'] == 'UCS2' or headers['alphabet'] == 'Chinese' or headers['alphabet'] == 'Unicode':
+				self.raw_body = body.decode('utf-16-be')
+			else:
+				logger.warn('unknown message encoding header encountered (%s), defaulting to latin-1' % (headers['alphabet']))
+				self.raw_body = body.decode('latin-1')
+		else:
+			logger.warn('no message encoding header encountered, defaulting to latin-1')
+			self.raw_body = body.decode('latin-1')
 		if headers.has_key('from'):
 			self.raw_phone_number = headers['from']
 		else:
 			raise SmircRawMessageException('no "from" header was found in the file %s' % (location))
 
 	def raw_send(self, phone_number, message):
+		# Try to encode our message as latin-1 first, and fallback to UTF-16 if
+		# we fail to do so.
+		try:
+			encoding = 'Ansi'
+			encoded_message = ('%s\n' % (message)).encode('latin-1')
+		except UnicodeEncodeError:
+			encoding = 'Unicode'
+			encoded_message = ('%s\n' % (message)).encode('utf-16-be')
+
 		tempfile.tempdir = settings.SMSTOOLS['outbound_dir']
 		(fd, path) = tempfile.mkstemp('.smircd', '%s-' % (phone_number), None, True)
 		os.fchmod(fd, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP)
 		f = os.fdopen(fd, 'w')
-		f.write('Alphabet: UCS2\n'.encode('latin-1'))
+		f.write(('Alphabet: %s\n' % (encoding)).encode('latin-1'))
 		f.write(('From: %s\n' % (settings.SMIRC_PHONE_NUMBER)).encode('latin-1'))
-		f.write(('To: %s\n' % (phone_number)).encode('latin-1'))
+		f.write(('To: %s\n' % (phone_number)).encode('latin-1'))	
 		f.write('\n'.encode('latin-1'))
-		# Note that UCS-2 is obsolete.  We assume that UCS-2 == UTF-16,
-		# which should work properly at least the grand majority of the time.
-		f.write(('%s\n' % (message)).encode('utf-16'))
+		f.write(encoded_message)
 		f.close()
 		return path
 
