@@ -5,15 +5,17 @@
 {% block content %}
 <h1>SMIRC Changelog</h1>
 
-<h3>2010-09-20</h3>
-<div>
-	SMIRC was offline for a little bit because of issues dealing with character encoding (specifically, it didn't deal well with characters
-	that go beyond the latin-1 character set).  It's back online now, and extended characters that push SMS messages beyond the latin-1
-	character set should work without incident now (i.e. characters like &acirc;).
-</div>
-<div>
-	At the same time I hardened SMIRC against errors of this type; so that in the future if it encounters a similar issue it may drop the
-	one problematic message, but the overall service won't be affected.
+<div class="changelog">
+	<h2>2010-09-20</h2>
+	<p>
+		SMIRC was offline for a little bit because of issues dealing with character encoding (specifically, it didn't deal well with characters
+		that go beyond the latin-1 character set).  It's back online now, and extended characters that push SMS messages beyond the latin-1
+		character set should work without incident now (i.e. characters like &acirc;).
+	</p>
+	<p>
+		At the same time I tweaked SMIRC to harden it against errors of this type; so that in the future if it encounters a similar issue it
+		may drop the one problematic message, but the overall service won't be affected.
+	</p>
 </div>
 
 {% endblock %}
