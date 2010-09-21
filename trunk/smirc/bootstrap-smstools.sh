@@ -30,13 +30,28 @@ report_device_details = yes
 ___EOF___
 __EOF__
 
-mkdir -p /var/spool/sms /var/spool/sms/checked /var/spool/sms/incoming /var/spool/sms/incoming/archived /var/spool/sms/outgoing /var/spool/sms/outgoing/failed /var/spool/sms/outgoing/report
+cat >"/etc/logrotate.d/smsd" <<__EOF__
+/var/spool/sms/smsd.log {
+	weekly
+	missingok
+	rotate 4
+	compress
+	delaycompress
+	notifempty
+	copytruncate
+}
+__EOF__
+
 addgroup --system sms
 adduser --system --home /var/spool/sms --no-create-home --ingroup sms --disabled-password smsd
 addgroup smsd dialout
-chown -R smsd.sms /var/spool/sms
-chmod 0755 /var/spool/sms /var/spool/sms/checked /var/spool/sms/outgoing/report /var/spool/sms/outgoing/failed
-chmod 0775 /var/spool/sms/incoming /var/spool/sms/incoming/archived /var/spool/sms/outgoing
+
+install --owner=smsd --group=sms --mode=0755 -d /var/spool/sms
+install --owner=smsd --group=sms --mode=0755 -d /var/spool/sms/checked
+install --owner=smsd --group=sms --mode=0775 -d /var/spool/sms/incoming /var/spool/sms/incoming/archived
+install --owner=smsd --group=sms --mode=0775 -d /var/spool/sms/outgoing
+install --owner=smsd --group=sms --mode=0755 -d /var/spool/sms/outgoing/failed /var/spool/sms/outgoing/report
+
 cat <<'__EOF__'
 
 ------------------------------------------------------------------------------------------
