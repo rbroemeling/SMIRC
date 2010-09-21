@@ -6,6 +6,9 @@ def smirc_render_to_response(request, *args, **kwargs):
 	kwargs['context_instance'] = RequestContext(request)
 	return render_to_response(*args, **kwargs)
 
+def changelog(request):
+	return smirc_render_to_response(request, 'pages/changelog.html', {})
+
 def faq(request):
 	return smirc_render_to_response(request, 'pages/faq.html', {})
 
