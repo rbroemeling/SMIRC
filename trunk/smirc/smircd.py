@@ -69,7 +69,9 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 					for recipient in Membership.objects.filter(conversation=message.sender.conversation).exclude(user=message.sender.user):
 						message.send(recipient.user.get_profile().phone_number)
 				except Membership.DoesNotExist:
-					pass		
+					pass
+				except Exception as e:
+					logger.exception('unhandled exception occurred while forwarding message: %s' % (e))
 		os.rename(event.pathname, '%s/archived/%s' % (settings.SMSTOOLS['inbound_dir'], os.path.basename(event.pathname)))
 		if response is not None:
 			try:
