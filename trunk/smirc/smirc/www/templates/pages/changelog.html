@@ -7,8 +7,13 @@
 
 <h3>2010-09-20</h3>
 <div>
-	SMIRC was offline for a little bit because of issues dealing with character encoding.  It's back online now, and "special" characters
-	that push SMS messages beyond the mere latin-1 character set should work without incident now.
+	SMIRC was offline for a little bit because of issues dealing with character encoding (specifically, it didn't deal well with characters
+	that go beyond the latin-1 character set).  It's back online now, and extended characters that push SMS messages beyond the latin-1
+	character set should work without incident now (i.e. characters like &acirc;).
+</div>
+<div>
+	At the same time I hardened SMIRC against errors of this type; so that in the future if it encounters a similar issue it may drop the
+	one problematic message, but the overall service won't be affected.
 </div>
 
 {% endblock %}
