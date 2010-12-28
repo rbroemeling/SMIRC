@@ -2,7 +2,7 @@
 . "${0%/*}/bootstrap.inc.sh"
 
 # Python build-time library requirements.
-aptitude install libbz2-dev libgdbm-dev libmysqlclient15-dev libreadline-dev libsqlite3-dev libssl-dev zlib1g-dev
+aptitude install libbz2-dev libgdbm-dev libmysqlclient16-dev libreadline-dev libsqlite3-dev libssl-dev zlib1g-dev
 
 # Add a "pythonbin" user who will be the owner/controller of our new python environment.
 if ! id pythonbin >/dev/null 2>&1; then
@@ -10,7 +10,7 @@ if ! id pythonbin >/dev/null 2>&1; then
 fi
 
 # Install Python 2.7.
-shutil_remote_source_install "http://www.python.org/ftp/python/2.7/Python-2.7.tar.bz2" <<'__EOF__'
+shutil_remote_source_install "http://www.python.org/ftp/python/2.7.1/Python-2.7.1.tar.bz2" <<'__EOF__'
 sudo -u nobody ./configure
 sudo -u nobody make
 sudo -u nobody make install prefix="${STOW_DIR}"
@@ -27,7 +27,7 @@ sudo -u pythonbin /usr/local/bin/python ez_setup.py
 sudo -u pythonbin rm ez_setup.py
 
 # Install MySQLdb.
-sudo -u pythonbin wget "http://downloads.sourceforge.net/project/mysql-python/mysql-python/1.2.3/MySQL-python-1.2.3.tar.gz?use_mirror=cdnetworks-us-1&ts=1279001583"
+sudo -u pythonbin wget "http://downloads.sourceforge.net/project/mysql-python/mysql-python/1.2.3/MySQL-python-1.2.3.tar.gz?r=&ts=1293516787&use_mirror=softlayer" -O "MySQL-python-1.2.3.tar.gz"
 sudo -u pythonbin tar zxvf "MySQL-python-1.2.3.tar.gz"
 cd "MySQL-python-1.2.3"
 sudo -u pythonbin /usr/local/bin/python setup.py install
