@@ -1,0 +1,20 @@
+defscrollback 1024
+startup_message off
+
+chdir ~/smirc.deploy/smirc
+screen sudo su -c 'env PYTHON_EGG_CACHE=/tmp/.python-eggs python manage.py runfcgi daemonize=false host=127.0.0.1 method=threaded port=3033' -s /bin/bash nobody
+title www.smirc.com
+
+chdir
+screen sudo su -c '/usr/local/bin/smsd -c/usr/local/etc/smsd.conf -p/var/spool/sms/smsd.pid -gsms -s -t' -s /bin/bash smsd
+title smsd
+
+chdir
+screen tail -n100 -f /var/spool/sms/smsd.log
+title smsd.log
+
+chdir ~/smirc.deploy
+screen sudo su -c 'env DJANGO_SETTINGS_MODULE="smirc.settings" SMIRC_ENVIRONMENT="development" python smircd.py' -s /bin/bash smsd
+title SMIRCd
+
+chdir
