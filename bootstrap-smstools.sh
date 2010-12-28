@@ -4,7 +4,7 @@
 # Pre-requisite for gathering statistics from smsd.
 aptitude install -y libmm-dev
 
-shutil_remote_source_install "http://smstools3.kekekasvi.com/packages/smstools3-3.1.11.tar.gz" <<'__EOF__'
+shutil_remote_source_install "http://smstools3.kekekasvi.com/packages/smstools3-3.1.14.tar.gz" <<'__EOF__'
 cd smstools3
 sudo -u nobody sed -ie 's/^CFLAGS .. -D NOSTATS$//' src/Makefile
 sudo -u nobody make
