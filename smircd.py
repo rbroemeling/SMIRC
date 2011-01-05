@@ -75,7 +75,10 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 					pass
 				except Exception as e:
 					logger.exception('unhandled exception occurred while forwarding message: %s' % (e))
-		os.rename(event.pathname, '%s/archived/%s' % (settings.SMSTOOLS['inbound_dir'], os.path.basename(event.pathname)))
+		try:
+			os.rename(event.pathname, '%s/archived/%s' % (settings.SMSTOOLS['inbound_dir'], os.path.basename(event.pathname)))
+		except OSError as e:
+			logger.exception('operating system exception occurred while archiving message %s: %s' % (event.pathname, e))
 		if response is not None:
 			try:
 				response.send(message.raw_phone_number)
