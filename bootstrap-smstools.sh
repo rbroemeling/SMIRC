@@ -10,8 +10,11 @@ sudo -u nobody sed -ie 's/^CFLAGS .. -D NOSTATS$//' src/Makefile
 sudo -u nobody make
 sudo -u nobody mkdir "${STOW_DIR}/bin"
 sudo -u nobody make install BINDIR="${STOW_DIR}/bin"
-sudo -u nobody mkdir "${STOW_DIR}/etc" 
-cat >"${STOW_DIR}/etc/smsd.conf" <<___EOF___
+sudo -u nobody mkdir "${STOW_DIR}/etc"
+
+cat >"${STOW_DIR}/etc/smsd.conf" <<'___EOF___'
+alarmhandler = /usr/local/bin/smsd-alarmhandler.sh
+alarmlevel = 5
 devices = ACM0
 failed = /var/spool/sms/outgoing/failed
 infofile = /var/spool/sms/smsd.running
@@ -28,6 +31,17 @@ phonecalls_purge = yes
 report = yes
 report_device_details = yes
 ___EOF___
+
+cat >"${STOW_DIR}/bin/smsd-alarmhandler.sh" <<'___EOF___'
+#!/bin/bash -e
+I=0
+for var in "${@}"; do
+	echo "ARG[${I}]: '${var}'"
+	I=$(( I + 1 ))
+done | mail -s "smsd-alarmhandler.sh (argc: ${#})" smsd
+___EOF___
+chmod 0755 "${STOW_DIR}/bin/smsd-alarmhandler.sh"
+
 __EOF__
 
 cat >"/etc/logrotate.d/smsd" <<__EOF__
