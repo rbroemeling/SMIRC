@@ -10,10 +10,12 @@
 	<p>
 		Updated <a href="http://smstools3.kekekasvi.com/">SMSTools</a> to the newest version and needed to make a number of tweaks to SMIRC
 		so that everything stayed working.  The new version of <a href="http://smstools3.kekekasvi.com/">SMSTools</a> should provide better
-		notifications for when the GSM modem drops off-line.
+		notifications for when the GSM modem drops off-line.  Also spent a little bit more time hardening SMIRC in general against unexpected
+		exceptions; should improve reliability a little more.
 	</p>
 	<p>
-		Also spent a little bit more time hardening SMIRC against unexpected exceptions; should improve reliability a little more.
+		Fixed a bug in the "new user" message that was supposed to go out to unknown phone numbers that sent a message to SMIRC.  It wasn't
+		being sent out correctly, but now that has been fixed and unregistered users that send texts to SMIRC should receive it properly.
 	</p>
 </div>
 
