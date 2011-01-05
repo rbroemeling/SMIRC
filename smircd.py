@@ -36,6 +36,9 @@ logger = logging.getLogger('smircd.py')
 class SMSFileHandler(pyinotify.ProcessEvent):
 	def process_IN_MODIFY(self, event):
 		logger.debug('event IN_MODIFY occurred for %s' % event.pathname)
+		if (os.path.splitext(os.path.basename(event.pathname))[0] == 'smsd_script'):
+			logger.warning('skipping SMSTools script %s' % event.pathname)
+			return
 		message = SMSToolsMessage()
 		response = None
 		try:
