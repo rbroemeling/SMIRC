@@ -41,10 +41,8 @@ cat >"${STOW_DIR}/bin/smsd-alarmhandler.sh" <<'___EOF___'
 		I=$(( I + 1 ))
 	done
 	echo
-	echo 'Recent Log Entries'
-	echo '--------------------------------------------------------------------------------'
+	echo 'Recent Log Entries:'
 	tail -n50 /var/spool/sms/smsd.log
-	echo '--------------------------------------------------------------------------------'
 } | mail -s "smsd-alarmhandler.sh (argc: ${#})" smsd
 ___EOF___
 chmod 0755 "${STOW_DIR}/bin/smsd-alarmhandler.sh"
