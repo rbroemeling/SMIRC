@@ -6,6 +6,15 @@
 <h1>SMIRC Changelog</h1>
 
 <div class="changelog">
+	<h2>2011-01-15</h2>
+	<p>
+		Fixed a problem when dealing with long SMS messages (i.e. messages longer than 160 characters) that caused SMIRC to interrupt the
+		SMS concatenation step of <a href="http://smstools3.kekekasvi.com/">SMSTools</a> and as an end result dropped the long message(s)
+		on the floor.  This has been fixed; messages longer than 160 characters should now be truncated, but otherwise go through normally.
+	</p>
+</div>
+
+<div class="changelog">
 	<h2>2011-01-05</h2>
 	<p>
 		Updated <a href="http://smstools3.kekekasvi.com/">SMSTools</a> to the newest version and needed to make a number of tweaks to SMIRC
