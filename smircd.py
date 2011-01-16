@@ -39,8 +39,8 @@ class SMSFileHandler(pyinotify.ProcessEvent):
 		if (os.path.splitext(os.path.basename(event.pathname))[0] == 'smsd_script'):
 			logger.warning('skipping SMSTools script %s' % event.pathname)
 			return
-		if (os.path.basename(event.pathname).rpartition('-')[2] == 'concatenated'):
-			logger.warning('skipping concatenated SMSTools message %s' % event.pathname)
+		if (os.path.basename(event.pathname).find('-concatenated') != -1):
+			logger.warning('skipping concatenated SMSTools transitional message %s' % event.pathname)
 			return
 		message = SMSToolsMessage()
 		response = None
