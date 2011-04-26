@@ -1,4 +1,5 @@
 defscrollback 1024
+sessionname smirc
 startup_message off
 
 chdir ~/smirc.deploy/smirc
