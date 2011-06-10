@@ -34,16 +34,24 @@ ___EOF___
 
 cat >"${STOW_DIR}/bin/smsd-alarmhandler.sh" <<'___EOF___'
 #!/bin/bash -e
-{
-	I=0
-	for var in "${@}"; do
-		echo "ARG[${I}]: '${var}'"
-		I=$(( I + 1 ))
-	done
-	echo
-	echo 'Recent Log Entries:'
-	tail -n50 /var/spool/sms/smsd.log
-} | mail -s "smsd-alarmhandler.sh (argc: ${#})" smsd
+if [[ "${6}" =~ "MODEM IS NOT REGISTERED, WAITING " ]]; then
+  ATTEMPT="$(echo "${6}" | sed -e 's/.*RETRYING //; s/[^0-9]//g')"
+  if [ "${ATTEMPT}" -ge "120" ]; then
+    MOD=$((${ATTEMPT} % 120))
+    if [ "${MOD}" -eq "0" ]; then
+      {
+        I=1
+        for var in "${@}"; do
+          echo "ARG[${I}]: '${var}'"
+          I=$(( I + 1 ))
+        done
+        echo
+        echo 'Recent Log Entries:'
+        tail -n50 /var/spool/sms/smsd.log
+      } | mail -s "smsd-alarmhandler.sh (argc: ${#})" smsd
+    fi
+  fi
+fi
 ___EOF___
 chmod 0755 "${STOW_DIR}/bin/smsd-alarmhandler.sh"
 
